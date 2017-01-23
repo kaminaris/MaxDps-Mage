@@ -98,9 +98,9 @@ function MaxDps.Mage.Fire()
 		return _Pyroblast;
 	end
 
-	if _isFlameOn and fbCharges == 0 and MaxDps:SpellAvailable(_FlameOn, timeShift) then
-		return _FlameOn;
-	end
+--	if _isFlameOn and fbCharges == 0 and MaxDps:SpellAvailable(_FlameOn, timeShift) then
+--		return _FlameOn;
+--	end
 
 	--actions.active_talents+=/blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast
 	--.charges<1&action.phoenixs_flames.charges<1)
