@@ -133,7 +133,7 @@ function MaxDps.Mage.Fire()
 	--actions.active_talents+=/living_bomb,if=active_enemies>1&buff.combustion.down
 	--NIY
 
-	if fbCharges > 0 and MaxDps:Aura(_HeatingUp, timeShift) then
+	if fbCharges >= 1 and MaxDps:Aura(_HeatingUp, timeShift) then
 		return _FireBlast;
 	end
 
