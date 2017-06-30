@@ -24,6 +24,7 @@ local _Kindling = 155148;
 local _IceBarrier = 11426;
 local _Shimmer = 212653;
 local _Pyromaniac = 205020;
+local _AlexstraszasFury = 235870;
 
 -- Frost
 local _IcyVeins = 12472;
@@ -61,13 +62,6 @@ local _WintersChill = 228358;
 local _MirrorImage = 55342;
 local _RuneofPower = 116011;
 
--- Talents
-local _isFlameOn = false;
-local _isBlastWave = false;
-local _isMeteor = false;
-local _isCinderstorm = false;
-local _isMirrorImage = false;
-local _isRuneofPower = false;
 
 -- Legendary items
 local _isKoralon = false;
@@ -78,14 +72,6 @@ local talents = {};
 
 MaxDps.Mage = {};
 function MaxDps.Mage.CheckTalents()
-	MaxDps:CheckTalents();
-	talents = MaxDps.PlayerTalents;
-	_isFlameOn = MaxDps:HasTalent(_FlameOn);
-	_isBlastWave = MaxDps:HasTalent(_BlastWave);
-	_isMeteor = MaxDps:HasTalent(_Meteor);
-	_isCinderstorm = MaxDps:HasTalent(_Cinderstorm);
-	_isMirrorImage = MaxDps:HasTalent(_MirrorImage);
-	_isRuneofPower = MaxDps:HasTalent(_RuneofPower);
 	_isKoralon = IsEquippedItem(132454);
 	_isDarckli = IsEquippedItem(132863);
 end
@@ -105,18 +91,20 @@ function MaxDps:EnableRotationModule(mode)
 	end;
 end
 
-function MaxDps.Mage.Arcane()
-	local timeShift, currentSpell = MaxDps:EndCast();
-
+function MaxDps.Mage.Arcane(_, timeShift, currentSpell, gcd, talents)
 	return nil;
 end
 
-function MaxDps.Mage.Fire()
-	local timeShift, currentSpell = MaxDps:EndCast();
-
+function MaxDps.Mage.Fire(_, timeShift, currentSpell, gcd, talents)
 	MaxDps:GlowCooldown(_Combustion, MaxDps:SpellAvailable(_Combustion, timeShift));
-	MaxDps:GlowCooldown(_RuneofPower, _isRuneofPower and MaxDps:SpellAvailable(_RuneofPower, timeShift));
-	MaxDps:GlowCooldown(_MirrorImage, _isMirrorImage and MaxDps:SpellAvailable(_MirrorImage, timeShift));
+
+	if talents[_RuneofPower] then
+		MaxDps:GlowCooldown(_RuneofPower, MaxDps:SpellAvailable(_RuneofPower, timeShift));
+	end
+
+	if talents[_MirrorImage] then
+		MaxDps:GlowCooldown(_MirrorImage, MaxDps:SpellAvailable(_MirrorImage, timeShift));
+	end
 
 	local combu, combuCD = MaxDps:Aura(_Combustion, timeShift);
 	local rop = MaxDps:PersistentAura(_RuneofPower);
@@ -134,13 +122,9 @@ function MaxDps.Mage.Fire()
 		return _Pyroblast;
 	end
 
---	if _isFlameOn and fbCharges == 0 and MaxDps:SpellAvailable(_FlameOn, timeShift) then
---		return _FlameOn;
---	end
-
 	--actions.active_talents+=/blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast
 	--.charges<1&action.phoenixs_flames.charges<1)
-	if _isBlastWave and MaxDps:SpellAvailable(_BlastWave, timeShift) and
+	if talents[_BlastWave] and MaxDps:SpellAvailable(_BlastWave, timeShift) and
 		((not combu) or
 		(combu and fbCharges < 1 and pfCharges < 1))
 	then
@@ -149,20 +133,20 @@ function MaxDps.Mage.Fire()
 
 	--actions.active_talents+=/meteor,if=cooldown.combustion.remains>30|(cooldown.combustion.remains>target
 	--.time_to_die)|buff.rune_of_power.up
-	if _isMeteor and MaxDps:SpellAvailable(_Meteor, timeShift) and ((combuCD > 30) or rop) then
+	if talents[_Meteor] and MaxDps:SpellAvailable(_Meteor, timeShift) and ((combuCD > 30) or rop) then
 		return _Meteor
 	end
 
 	--actions.active_talents+=/cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent
 	--.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
-	if _isCinderstorm and MaxDps:SpellAvailable(_Cinderstorm, timeShift) and
+	if talents[_Cinderstorm] and MaxDps:SpellAvailable(_Cinderstorm, timeShift) and
 		not MaxDps:SameSpell(currentSpell, _Cinderstorm) and
 		not combu and not rop then
 		return _Cinderstorm;
 	end
 
 	--actions.active_talents+=/dragons_breath,if=equipped.132863
-	if _isDarckli and MaxDps:SpellAvailable(_DragonsBreath, timeShift) then
+	if (_isDarckli or talents[_AlexstraszasFury]) and MaxDps:SpellAvailable(_DragonsBreath, timeShift) then
 		return _DragonsBreath;
 	end
 
@@ -181,14 +165,12 @@ function MaxDps.Mage.Fire()
 	return _Fireball;
 end
 
-function MaxDps.Mage.Frost()
-	local timeShift, currentSpell = MaxDps:EndCast();
+function MaxDps.Mage.Frost(_, timeShift, currentSpell, gcd, talents)
 	local _, currentPetSpell = MaxDps:EndCast('pet');
 
 	local rop = MaxDps:PersistentAura(_RuneofPower);
 	local fof, fofCharges = MaxDps:Aura(_FingersofFrost, timeShift);
 	local ici, iciCharges = MaxDps:Aura(_Icicles, timeShift);
-	local bf, bfCd = MaxDps:Aura(_BrainFreeze, timeShift);
 	local cr, crCharges, crCd = MaxDps:Aura(_ChainReaction, timeShift);
 
 	local elemental = UnitExists('pet');
@@ -220,7 +202,7 @@ function MaxDps.Mage.Frost()
 		return _FrostBomb;
 	end
 
-	if bf then
+	if MaxDps:Aura(_BrainFreeze, timeShift) then
 		return _Flurry;
 	end
 
@@ -251,11 +233,6 @@ function MaxDps.Mage.ArcaneCharge()
 		charges = 0;
 	end
 	return charges;
-end
-
-function MaxDps.Mage.RuneOfPower()
-	local n = UnitAura('player', 'Rune of Power')
-	return n == 'Rune of Power';
 end
 
 function MaxDps.Mage.Ignite()
