@@ -57,6 +57,35 @@ local _LonelyWinter = 205024;
 local _ChainReaction = 195419;
 local _WintersChill = 228358;
 
+-- Arcane
+
+-- Offensive Abilities
+local _MarkOfAluneth  = 224968;
+local _Arcane_Explosion = 1449;
+local _Arcane_Missiles  = 5143;
+local _Arcane_Barrage   = 44425;
+local _Arcane_Blast     = 30451;
+
+-- Offensive Cooldowns
+local _Time_Warp = 80353 ;
+local _Arcance_Power = 12042;
+local _Presence_of_Mind = 205025;
+
+-- Defensive Cooldowns
+local _Ice_Block = 45438;
+local _Prismatic_Barrier = 234550;
+
+-- talent
+local _MirrorImage = 55342;
+local _RuneofPower = 116011;
+
+-- Utils
+local _Evocation = 12051;
+
+-- Aura
+local _RhoninsAssaulting = 208081;
+local _ArcaneMissilesAura = 79683;
+
 -- CDs
 
 local _MirrorImage = 55342;
@@ -92,7 +121,110 @@ function MaxDps:EnableRotationModule(mode)
 end
 
 function MaxDps.Mage.Arcane(_, timeShift, currentSpell, gcd, talents)
-	return nil;
+	-- Ressource
+	local arcaneCharge = UnitPower('player', SPELL_POWER_ARCANE_CHARGES);
+	local mana = UnitMana("player");
+	local maxMana = UnitManaMax("player");
+
+	local freeBlast = MaxDps:Aura(_RhoninsAssaulting);
+	local _, _, maCharge = MaxDps:Aura(_ArcaneMissilesAura);
+
+	-- Cooldowns are included in rotation because of burn phase
+	-- _Arcance_Power
+	-- MaxDps:GlowCooldown(_Arcance_Power, MaxDps:SpellAvailable(_Arcance_Power, timeShift));
+	-- _Presence_of_Mind
+	-- MaxDps:GlowCooldown(_Presence_of_Mind, MaxDps:SpellAvailable(_Presence_of_Mind, timeShift));
+	-- rune
+	MaxDps:GlowCooldown(_RuneofPower, talents[_RuneofPower] and MaxDps:SpellAvailable(_RuneofPower, timeShift));
+	-- image
+	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
+
+	-- _Ice_Block
+	-- MaxDps:GlowCooldown(_Ice_Block, MaxDps:SpellAvailable(_Ice_Block, timeShift));
+	-- _Prismatic_Barrier
+	-- MaxDps:GlowCooldown(_Prismatic_Barrier, MaxDps:SpellAvailable(_Prismatic_Barrier, timeShift));
+
+	-- legendary buff
+	if freeBlast then
+		return _Arcane_Blast;
+	end
+
+	-- burn
+	if MaxDps:SpellAvailable(_Evocation, timeShift) then
+		-- Arcane Missiles (at three stacks)
+		if maCharge >= 3 then
+			return _Arcane_Missiles;
+		end
+
+		-- Mark of Aluneth
+		if MaxDps:SpellAvailable(_MarkOfAluneth, timeShift) and not MaxDps:SameSpell(currentSpell, _MarkOfAluneth) then
+			return _MarkOfAluneth;
+		end
+
+		if mana < 200000 then
+			return _Evocation;
+		end
+
+		-- Build to four Arcane Charges ( Arcane Blast x 4, Charged Up, etc)
+		if MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) then
+			if arcaneCharge <= 0 or not MaxDps:SpellAvailable(_Arcane_Barrage, timeShift) then
+				return _Presence_of_Mind;
+			else
+				return _Arcane_Barrage;
+			end
+		end
+
+		-- on est ici à arcaneCharge = 4
+		if arcaneCharge > 3 then
+			-- Rune of Power (talent)
+			-- Mirror Image (talent)
+			-- Arcane Power
+			MaxDps:GlowCooldown(_Arcance_Power, MaxDps:SpellAvailable(_Arcance_Power, timeShift));
+
+			-- Arcane Missiles (at four Arcane Charges)
+			if maCharge > 0 then
+				return _Arcane_Missiles;
+			end
+		end
+		-- Nether Tempest (talent) (at four Arcane Charges)
+		-- Arcane Blast
+		return _Arcane_Blast;
+		-- Supernova (talent)
+	end
+
+	-- conserve
+	-- Stay at a high enough mana level that you will be near to 100% when Evocation comes off of cooldown.
+	-- In practice this will mean hovering between 100% and around 50%. At early gear levels you will probably
+	-- need to Arcane Barrage before reaching four Arcane Charge stacks.
+	-- Arcane Missiles (at four Arcane Charges or three Arcane Missiles stacks)
+	if (arcaneCharge > 3 and maCharge > 0) or (maCharge >= 3) then
+		return _Arcane_Missiles;
+	end
+
+	if maCharge > 0 and MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) then
+		if  MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) and
+			(arcaneCharge <= 0 or not MaxDps:SpellAvailable(_Arcane_Barrage, timeShift))
+		then
+			return _Presence_of_Mind;
+		else
+			return _Arcane_Barrage;
+		end
+	end
+
+
+	-- Arcane Barrage (if no Arcane Missiles stacks)
+	if MaxDps:SpellAvailable(_Arcane_Barrage, timeShift) and maCharge < 2 and arcaneCharge >= 3 then
+		return _Arcane_Barrage;
+	end
+
+	-- Supernova (talent)
+	-- _MarkOfAluneth
+	if MaxDps:SpellAvailable(_MarkOfAluneth, timeShift) and not MaxDps:SameSpell(currentSpell, _MarkOfAluneth) and (maxMana * 0.65) < mana then
+		return _MarkOfAluneth;
+	end
+
+	-- Nether Tempest (talent) (at four Arcane Charges)
+	return _Arcane_Blast;
 end
 
 function MaxDps.Mage.Fire(_, timeShift, currentSpell, gcd, talents)
