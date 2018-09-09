@@ -1,365 +1,385 @@
+--- @type MaxDps
+if not MaxDps then
+	return ;
+end
+
+local Mage = MaxDps:NewModule('Mage', 'AceEvent-3.0');
+
 -- Fire
+
 local _Combustion = 190319;
-local _PhoenixsFlames = 194466;
-local _FlameOn = 205029;
-local _Flamestrike = 2120;
-local _HotStreak = 195283;
-local _HotStreakAura = 48108;
-local _Pyroblast = 11366;
 local _Meteor = 153561;
+local _Pyroclasm = 269651;
+local _PhoenixFlames = 257541;
+local _Flamestrike = 2120;
+local _FlamePatch = 205037;
+local _HotStreak = 48108;
 local _LivingBomb = 44457;
-local _FireBlast = 108853;
 local _DragonsBreath = 31661;
+local _FireBlast = 108853;
 local _HeatingUp = 48107;
-local _Fireball = 133;
 local _Scorch = 2948;
-local _IceFloes = 108839;
-local _Ignite = 12654;
-local _BlastWave = 157981;
-local _Cinderstorm = 198929;
-local _FrostNova = 122;
-local _Blink = 1953;
-local _IceBlock = 45438;
-local _Kindling = 155148;
-local _IceBarrier = 11426;
-local _Shimmer = 212653;
-local _Pyromaniac = 205020;
+local _SearingTouch = 269644;
+local _Fireball = 133;
 local _AlexstraszasFury = 235870;
+local _Ignite = 12654;
+local _Pyroblast = 11366;
+local _BlastWave = 157981;
+local _FrostNova = 122;
+local _Kindling = 155148;
+local _BlazingBarrier = 235313;
+local _Firestarter = 205026;
+local _Pyromaniac = 205020;
 
 -- Frost
-local _IcyVeins = 12472;
-local _RayofFrost = 205021;
-local _IceLance = 30455;
-local _FingersofFrost = 112965;
-local _FrostBomb = 112948;
-local _FrozenOrb = 84714;
-local _Freeze = 33395;
-local _Ebonbolt = 214634;
-local _BrainFreeze = 190447;
-local _Flurry = 44614;
+
 local _Frostbolt = 116;
-local _WaterJet = 135029;
-local _IceNova = 157997;
-local _CometStorm = 153595;
-local _Blizzard = 190356;
-local _ArcticGale = 205038;
+local _FingersofFrost = 44544;
+local _IceLance = 30455;
+local _BrainFreeze = 190446;
 local _GlacialSpike = 199786;
-local _IncantersFlow = 1463;
-local _ThermalVoid = 155149;
-local _SplittingIce = 56377;
+local _Flurry = 44614;
+local _IcyVeins = 12472;
+local _FrozenOrb = 84714;
+local _RayofFrost = 205021;
+local _Ebonbolt = 257537;
+local _CometStorm = 153595;
+local _IceNova = 157997;
+local _Blizzard = 190356;
+local _FreezingRain = 270233;
+local _WintersReach = 273346;
+local _Shatter = 12982;
+local _Freeze = 231596;
+local _ConeofCold = 120;
 local _IceFloes = 108839;
-local _Blink = 1953;
-local _IceBarrier = 11426;
-local _Shimmer = 212653;
+local _LonelyWinter = 205024;
 local _SummonWaterElemental = 31687;
 local _Icicles = 205473;
-local _LonelyWinter = 205024;
-local _ChainReaction = 195419;
-local _WintersChill = 228358;
+local _SplittingIce = 56377;
+
+local _SpellWhitelist = {
+	[_Frostbolt] = 1,
+	[_Ebonbolt] = 1,
+	[_Flurry] = 1,
+	[_IceLance] = 1,
+	[_FrozenOrb] = 1,
+	[_RayofFrost] = 1,
+	[_GlacialSpike] = 1,
+};
 
 -- Arcane
 
--- Offensive Abilities
-local _MarkOfAluneth  = 224968;
-local _Arcane_Explosion = 1449;
-local _Arcane_Missiles  = 5143;
-local _Arcane_Barrage   = 44425;
-local _Arcane_Blast     = 30451;
-
--- Offensive Cooldowns
-local _Time_Warp = 80353 ;
-local _Arcance_Power = 12042;
-local _Presence_of_Mind = 205025;
-
--- Defensive Cooldowns
-local _Ice_Block = 45438;
-local _Prismatic_Barrier = 234550;
-
--- talent
-local _MirrorImage = 55342;
-local _RuneofPower = 116011;
-
--- Utils
 local _Evocation = 12051;
+local _ArcanePower = 12042;
+local _Overpowered = 155147;
+local _ArcaneOrb = 153626;
+local _NetherTempest = 114923;
+local _ArcaneBlast = 30451;
+local _RuleofThrees = 264774;
+local _PresenceofMind = 205025;
+local _ArcaneBarrage = 44425;
+local _ArcaneExplosion = 1449;
+local _ArcaneMissiles = 5143;
+local _Clearcasting = 263725;
+local _Amplification = 236628;
+local _ChargedUp = 205032;
+local _Supernova = 157980;
+local _DrainSoul = 198590;
+local _Resonance = 205028;
+local _Displacement = 195676;
 
--- Aura
-local _RhoninsAssaulting = 208081;
-local _ArcaneMissilesAura = 79683;
-
--- CDs
+-- Shared
 
 local _MirrorImage = 55342;
 local _RuneofPower = 116011;
-
-
--- Legendary items
-local _isKoralon = false;
-local _isDarckli = false;
 
 _BaseArcaneBlastCost = 3200;
-local talents = {};
 
-MaxDps.Mage = {};
-function MaxDps.Mage.CheckTalents()
-	_isKoralon = IsEquippedItem(132454);
-	_isDarckli = IsEquippedItem(132863);
+
+function Mage:Enable()
+	MaxDps:Print(MaxDps.Colors.Info .. 'Mage [Arcane, Fire, Frost]');
+
+	if MaxDps.Spec == 1 then
+		MaxDps.NextSpell = Mage.Arcane;
+	elseif MaxDps.Spec == 2 then
+		MaxDps.NextSpell = Mage.Fire;
+	elseif MaxDps.Spec == 3 then
+		MaxDps.NextSpell = Mage.Frost;
+		self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED')
+	end
+
+	return true;
 end
 
-function MaxDps:EnableRotationModule(mode)
-	mode = mode or 1;
-	MaxDps.Description = 'Mage [Fire]';
-	MaxDps.ModuleOnEnable = MaxDps.Mage.CheckTalents;
-	if mode == 1 then
-		MaxDps.NextSpell = MaxDps.Mage.Arcane;
-	end;
-	if mode == 2 then
-		MaxDps.NextSpell = MaxDps.Mage.Fire;
-	end;
-	if mode == 3 then
-		MaxDps.NextSpell = MaxDps.Mage.Frost;
-	end;
+function Mage:Disable()
+	self:UnregisterAllEvents();
 end
 
-function MaxDps.Mage.Arcane(_, timeShift, currentSpell, gcd, talents)
+function Mage:UNIT_SPELLCAST_SUCCEEDED(event, unitID, spell, spellId)
+	if unitID == 'player'and _SpellWhitelist[spellId] == 1 then
+		Mage.lastSpell = spellId;
+	end
+end
+
+
+function Mage:Arcane(timeShift, currentSpell, gcd, talents)
 	-- Ressource
-	local arcaneCharge = UnitPower('player', SPELL_POWER_ARCANE_CHARGES);
-	local mana = UnitMana("player");
-	local maxMana = UnitManaMax("player");
+	local arcaneCharge = UnitPower('player', Enum.PowerType.ArcaneCharges);
+	local mana = UnitPower('player', Enum.PowerType.Mana);
+	local maxMana = UnitPowerMax('player', Enum.PowerType.Mana);
+	local manaPct = mana / maxMana;
 
-	local freeBlast = MaxDps:Aura(_RhoninsAssaulting);
-	local _, _, maCharge = MaxDps:Aura(_ArcaneMissilesAura);
+	if currentSpell == _ArcaneBlast then
+		arcaneCharge = arcaneCharge + 1;
+	end
 
-	-- Cooldowns are included in rotation because of burn phase
-	-- _Arcance_Power
-	-- MaxDps:GlowCooldown(_Arcance_Power, MaxDps:SpellAvailable(_Arcance_Power, timeShift));
-	-- _Presence_of_Mind
-	-- MaxDps:GlowCooldown(_Presence_of_Mind, MaxDps:SpellAvailable(_Presence_of_Mind, timeShift));
-	-- rune
-	MaxDps:GlowCooldown(_RuneofPower, talents[_RuneofPower] and MaxDps:SpellAvailable(_RuneofPower, timeShift));
+	local ap, apCd = MaxDps:Aura(_ArcanePower, timeShift);
+	local rop = MaxDps:Aura(_RuneofPower);
+	local _, ropCharges, ropCd = MaxDps:SpellCharges(_RuneofPower, timeShift);
+
 	-- image
 	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
 
-	-- _Ice_Block
-	-- MaxDps:GlowCooldown(_Ice_Block, MaxDps:SpellAvailable(_Ice_Block, timeShift));
-	-- _Prismatic_Barrier
-	-- MaxDps:GlowCooldown(_Prismatic_Barrier, MaxDps:SpellAvailable(_Prismatic_Barrier, timeShift));
+	local burnCond = MaxDps:SpellAvailable(_ArcanePower, timeShift) and arcaneCharge >= 4 and
+		(ropCharges >= 1 or not talents[_RuneofPower]) and
+		((talents[_Overpowered] and manaPct > 0.3) or manaPct > 0.5);
 
-	-- legendary buff
-	if freeBlast then
-		return _Arcane_Blast;
-	end
+	MaxDps:GlowCooldown(_ArcanePower, burnCond);
 
 	-- burn
 	if MaxDps:SpellAvailable(_Evocation, timeShift) then
-		-- Arcane Missiles (at three stacks)
-		if maCharge >= 3 then
-			return _Arcane_Missiles;
-		end
 
-		-- Mark of Aluneth
-		if MaxDps:SpellAvailable(_MarkOfAluneth, timeShift) and not MaxDps:SameSpell(currentSpell, _MarkOfAluneth) then
-			return _MarkOfAluneth;
-		end
-
-		if mana < 200000 then
+		if manaPct < 0.05 then
 			return _Evocation;
 		end
 
-		-- Build to four Arcane Charges ( Arcane Blast x 4, Charged Up, etc)
-		if MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) then
-			if arcaneCharge <= 0 or not MaxDps:SpellAvailable(_Arcane_Barrage, timeShift) then
-				return _Presence_of_Mind;
-			else
-				return _Arcane_Barrage;
-			end
+		if talents[_ChargedUp] and MaxDps:SpellAvailable(_ChargedUp, timeShift) and arcaneCharge <= 1 then
+			return _ChargedUp;
 		end
 
-		-- on est ici à arcaneCharge = 4
-		if arcaneCharge > 3 then
-			-- Rune of Power (talent)
-			-- Mirror Image (talent)
-			-- Arcane Power
-			MaxDps:GlowCooldown(_Arcance_Power, MaxDps:SpellAvailable(_Arcance_Power, timeShift));
-
-			-- Arcane Missiles (at four Arcane Charges)
-			if maCharge > 0 then
-				return _Arcane_Missiles;
-			end
+		if talents[_ArcaneOrb] and MaxDps:SpellAvailable(_ArcaneOrb, timeShift) and arcaneCharge < 4 then
+			return _ArcaneOrb;
 		end
-		-- Nether Tempest (talent) (at four Arcane Charges)
-		-- Arcane Blast
-		return _Arcane_Blast;
-		-- Supernova (talent)
-	end
 
-	-- conserve
-	-- Stay at a high enough mana level that you will be near to 100% when Evocation comes off of cooldown.
-	-- In practice this will mean hovering between 100% and around 50%. At early gear levels you will probably
-	-- need to Arcane Barrage before reaching four Arcane Charge stacks.
-	-- Arcane Missiles (at four Arcane Charges or three Arcane Missiles stacks)
-	if (arcaneCharge > 3 and maCharge > 0) or (maCharge >= 3) then
-		return _Arcane_Missiles;
-	end
-
-	if maCharge > 0 and MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) then
-		if  MaxDps:SpellAvailable(_Presence_of_Mind, timeShift) and
-			(arcaneCharge <= 0 or not MaxDps:SpellAvailable(_Arcane_Barrage, timeShift))
-		then
-			return _Presence_of_Mind;
-		else
-			return _Arcane_Barrage;
+		if talents[_NetherTempest] and not ap and not rop and not MaxDps:TargetAura(_NetherTempest, timeShift + 3)
+			and arcaneCharge >= 4 then
+			return _NetherTempest;
 		end
+
+		if talents[_RuleofThrees] and talents[_Overpowered] and MaxDps:Aura(_RuleofThrees, timeShift) and
+			currentSpell ~= _ArcaneBlast then
+			return _ArcaneBlast;
+		end
+
+		if talents[_RuneofPower] and ropCharges > 1.6 then
+			return _RuneofPower;
+		end
+
+		local pom, pomCd = MaxDps:SpellAvailable(_PresenceofMind, timeShift);
+		if pom and apCd < 2 and not MaxDps:Aura(_PresenceofMind, timeShift) then
+			return _PresenceofMind;
+		end
+
+		local cc = MaxDps:Aura(_Clearcasting, timeShift);
+		local am = MaxDps:SpellAvailable(_ArcaneMissiles, timeShift);
+
+		if talents[_Amplification] and cc and am and currentSpell ~= _ArcaneMissiles then
+			return _ArcaneMissiles;
+		end
+
+		if am and cc and not ap and manaPct < 0.95 and currentSpell ~= _ArcaneMissiles  then
+			return _ArcaneMissiles;
+		end
+
+		return _ArcaneBlast;
 	end
 
 
-	-- Arcane Barrage (if no Arcane Missiles stacks)
-	if MaxDps:SpellAvailable(_Arcane_Barrage, timeShift) and maCharge < 2 and arcaneCharge >= 3 then
-		return _Arcane_Barrage;
+	if talents[_ChargedUp] and MaxDps:SpellAvailable(_ChargedUp, timeShift) and arcaneCharge == 0 then
+		return _ChargedUp;
 	end
 
-	-- Supernova (talent)
-	-- _MarkOfAluneth
-	if MaxDps:SpellAvailable(_MarkOfAluneth, timeShift) and not MaxDps:SameSpell(currentSpell, _MarkOfAluneth) and (maxMana * 0.65) < mana then
-		return _MarkOfAluneth;
+	if talents[_NetherTempest] and not MaxDps:TargetAura(_NetherTempest, timeShift + 3) and arcaneCharge >= 4 then
+		return _NetherTempest;
 	end
 
-	-- Nether Tempest (talent) (at four Arcane Charges)
-	return _Arcane_Blast;
+	if talents[_ArcaneOrb] and MaxDps:SpellAvailable(_ArcaneOrb, timeShift) and arcaneCharge < 4 then
+		return _ArcaneOrb;
+	end
+
+	if talents[_RuneofPower] and ropCharges > 1.8 and currentSpell ~= _RuneofPower then
+		return _RuneofPower;
+	end
+
+	if talents[_RuleofThrees] and MaxDps:Aura(_RuleofThrees, timeShift) then
+		return _ArcaneBlast;
+	end
+
+	if MaxDps:Aura(_Clearcasting, timeShift) and MaxDps:SpellAvailable(_ArcaneMissiles, timeShift) and
+		currentSpell ~= _ArcaneMissiles
+	then
+		return _ArcaneMissiles;
+	end
+
+	if manaPct < 0.6 and arcaneCharge >= 4 then
+		return _ArcaneBarrage;
+	end
+
+	if talents[_Supernova] and MaxDps:SpellAvailable(_Supernova, timeShift) then
+		return _Supernova;
+	end
+
+	return _ArcaneBlast;
 end
 
-function MaxDps.Mage.Fire(_, timeShift, currentSpell, gcd, talents)
-	MaxDps:GlowCooldown(_Combustion, MaxDps:SpellAvailable(_Combustion, timeShift));
+function Mage:Fire(timeShift, currentSpell, gcd, talents)
 
-	if talents[_RuneofPower] then
-		MaxDps:GlowCooldown(_RuneofPower, MaxDps:SpellAvailable(_RuneofPower, timeShift));
-	end
+	MaxDps:GlowCooldown(_Combustion, MaxDps:SpellAvailable(_Combustion, timeShift));
 
 	if talents[_MirrorImage] then
 		MaxDps:GlowCooldown(_MirrorImage, MaxDps:SpellAvailable(_MirrorImage, timeShift));
 	end
 
 	local combu, combuCD = MaxDps:Aura(_Combustion, timeShift);
-	local rop = MaxDps:PersistentAura(_RuneofPower);
+	--local rop = MaxDps:Aura(_RuneofPower);
 
-	local pf, pfCharges = MaxDps:SpellCharges(_PhoenixsFlames, timeShift);
+	local _, ropCharges, ropCd = MaxDps:SpellCharges(_RuneofPower, timeShift);
 	local fb, fbCharges = MaxDps:SpellCharges(_FireBlast, timeShift);
+	local pf, pfCharges = MaxDps:SpellCharges(_PhoenixFlames, timeShift);
 
-	local ph = MaxDps:TargetPercentHealth();
 
-	if pfCharges >= 2 then
-		return _PhoenixsFlames;
+	if talents[_RuneofPower] and MaxDps:SpellAvailable(_RuneofPower, timeShift) and combu
+		and currentSpell ~= _RuneofPower then
+		return  _RuneofPower;
 	end
 
-	if MaxDps:Aura(_HotStreakAura, timeShift) then
+	--Cast Meteor, if talented. Only cast it together with Rune of Power of Power, if talented.
+	if talents[_Meteor] and MaxDps:SpellAvailable(_Meteor, timeShift) then
+		return _Meteor;
+	end
+
+	-- Use Rune of Power if it has 2 charges or will have 2 charges within 2 seconds, or you have a Pyroclasm proc,
+	-- and Combustion will not be available before a second Rune of Power charge becomes available.
+	if talents[_RuneofPower] then
+		if (ropCharges >= 1.8 or MaxDps:Aura(_Pyroclasm, timeShift)) and currentSpell ~= _RuneofPower then
+			return _RuneofPower;
+		end
+	end
+
+	--Cast Phoenix Flames if it has 3 charges or will have 3 charges soon, if talented.
+	if talents[_PhoenixFlames] and pfCharges >= 2.5 then
+		return _PhoenixFlames;
+	end
+
+	--Cast Pyroblast when you have a Hot Streak Streak proc.
+	if MaxDps:Aura(_HotStreak, timeShift) then
 		return _Pyroblast;
 	end
 
-	--actions.active_talents+=/blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast
-	--.charges<1&action.phoenixs_flames.charges<1)
-	if talents[_BlastWave] and MaxDps:SpellAvailable(_BlastWave, timeShift) and
-		((not combu) or
-		(combu and fbCharges < 1 and pfCharges < 1))
-	then
-		return _BlastWave;
-	end
-
-	--actions.active_talents+=/meteor,if=cooldown.combustion.remains>30|(cooldown.combustion.remains>target
-	--.time_to_die)|buff.rune_of_power.up
-	if talents[_Meteor] and MaxDps:SpellAvailable(_Meteor, timeShift) and ((combuCD > 30) or rop) then
-		return _Meteor
-	end
-
-	--actions.active_talents+=/cinderstorm,if=cooldown.combustion.remains<cast_time&(buff.rune_of_power.up|!talent
-	--.rune_on_power.enabled)|cooldown.combustion.remains>10*spell_haste&!buff.combustion.up
-	if talents[_Cinderstorm] and MaxDps:SpellAvailable(_Cinderstorm, timeShift) and
-		not MaxDps:SameSpell(currentSpell, _Cinderstorm) and
-		not combu and not rop then
-		return _Cinderstorm;
-	end
-
-	--actions.active_talents+=/dragons_breath,if=equipped.132863
-	if (_isDarckli or talents[_AlexstraszasFury]) and MaxDps:SpellAvailable(_DragonsBreath, timeShift) then
+	--Cast Dragon's Breath's Breath if Combustion is active and you have no Fire Blast Blast available.
+	if combu and fbCharges < 0.8 and MaxDps:SpellAvailable(_DragonsBreath, timeShift) then
 		return _DragonsBreath;
 	end
 
-	--actions.active_talents+=/living_bomb,if=active_enemies>1&buff.combustion.down
-	--NIY
-
+	--Cast Fire Blast when you have Heating Up.
 	if fbCharges >= 1 and MaxDps:Aura(_HeatingUp, timeShift) then
 		return _FireBlast;
 	end
 
+	--Cast Scorch if you have Searing Touch talented and the target is below 30% Health, to generate Heating Up	and Hot Streak Streaks.
+	local ph = MaxDps:TargetPercentHealth();
+	if talents[_SearingTouch] and ph < 0.3 then
+		return _Scorch;
+	end
+
+	--Cast Fireball to generate Heating Up.
+	--Cast Scorch if you have to move and have no instant casts to burn.
 	local moving = GetUnitSpeed('player');
-	if (_isKoralon and ph < 0.25) or moving > 0 then
+	if moving > 0 then
 		return _Scorch;
 	end
 
 	return _Fireball;
 end
 
-function MaxDps.Mage.Frost(_, timeShift, currentSpell, gcd, talents)
-	local _, currentPetSpell = MaxDps:EndCast('pet');
-
-	local rop = MaxDps:PersistentAura(_RuneofPower);
-	local fof, fofCharges = MaxDps:Aura(_FingersofFrost, timeShift);
+function Mage:Frost(timeShift, currentSpell, gcd, talents)
+	local rop = MaxDps:Aura(_RuneofPower);
 	local ici, iciCharges = MaxDps:Aura(_Icicles, timeShift);
-	local cr, crCharges, crCd = MaxDps:Aura(_ChainReaction, timeShift);
 
-	local elemental = UnitExists('pet');
+	if currentSpell == _Frostbolt then
+		iciCharges = iciCharges + 1;
+	end
 
-	MaxDps:GlowCooldown(_RuneofPower, talents[_RuneofPower] and MaxDps:SpellAvailable(_RuneofPower, timeShift));
 	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
+	MaxDps:GlowCooldown(_IcyVeins, MaxDps:SpellAvailable(_IcyVeins, timeShift));
 
-	if not talents[_LonelyWinter] and not elemental and MaxDps:SpellAvailable(_SummonWaterElemental, timeShift) and
-			not MaxDps:SameSpell(currentSpell, _SummonWaterElemental) then
+
+	if not talents[_LonelyWinter] and not UnitExists('pet')
+		and MaxDps:SpellAvailable(_SummonWaterElemental, timeShift)
+		and currentSpell ~= _SummonWaterElemental
+	then
 		return _SummonWaterElemental;
 	end
 
-	if talents[_RayofFrost] and MaxDps:SpellAvailable(_RayofFrost, timeShift) then
-		if talents[_RuneofPower] then
-			if rop then
-				return _RayofFrost;
-			end
-		else
-			return _RayofFrost;
-		end
-	end
-
-	if fofCharges >= 3 then
+	--Ice Lance after every Flurry cast. @TODO
+	if Mage.lastSpell == _Flurry or currentSpell == _Flurry then
 		return _IceLance;
 	end
 
-	if talents[_FrostBomb] and fofCharges >= 1 and not MaxDps:SameSpell(currentSpell, _FrostBomb) and not
-		MaxDps:TargetAura(_FrostBomb, timeShift) then
-		return _FrostBomb;
-	end
-
-	if MaxDps:Aura(_BrainFreeze, timeShift) then
+	if MaxDps:Aura(_BrainFreeze, timeShift) and
+		(
+			talents[_GlacialSpike] and (
+				(iciCharges >= 5 and currentSpell == _GlacialSpike) or
+				(iciCharges <= 3 and currentSpell == _Frostbolt)
+			)
+				or
+			not talents[_GlacialSpike] and (
+				currentSpell == _Ebonbolt or
+				currentSpell == _Frostbolt
+			)
+		)
+	then
 		return _Flurry;
 	end
 
-	if MaxDps:SameSpell(currentSpell, _Flurry) or MaxDps:TargetAura(_WintersChill, timeShift) then
+	if MaxDps:SpellAvailable(_FrozenOrb, timeShift) then
+		return _FrozenOrb;
+	end
+
+	if MaxDps:Aura(_FingersofFrost, timeShift) then
 		return _IceLance;
 	end
 
-	if not talents[_LonelyWinter] and MaxDps:SpellAvailable(_WaterJet, timeShift) and not fof and
-			not MaxDps:SameSpell(currentPetSpell, _WaterJet) then
-		return _WaterJet;
+	if talents[_RayofFrost] and MaxDps:SpellAvailable(_RayofFrost, timeShift) and currentSpell ~= _RayofFrost then
+		return _RayofFrost;
 	end
 
-	--Chain reaction
-	if fofCharges >= 1 and (crCd < 1 or crCharges >= 3) then
-		return _IceLance;
+	if talents[_CometStorm] and MaxDps:SpellAvailable(_CometStorm, timeShift) then
+		return _CometStorm;
 	end
 
-	if talents[_GlacialSpike] and iciCharges >= 5 and not MaxDps:SameSpell(currentSpell, _GlacialSpike) then
+	if not talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and currentSpell ~= _Ebonbolt then
+		return _Ebonbolt;
+	end
+
+	if talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and iciCharges >= 5
+		and not MaxDps:Aura(_BrainFreeze, timeShift) and currentSpell ~= _Ebonbolt
+	then
+		return _Ebonbolt;
+	end
+
+	local targets = MaxDps:TargetsInRange(_IceLance);
+	if talents[_GlacialSpike] and MaxDps:SpellAvailable(_GlacialSpike, timeShift) and iciCharges >= 5 and
+		currentSpell ~= _GlacialSpike and (
+		(talents[_SplittingIce] and targets >= 2) or MaxDps:Aura(_BrainFreeze, timeShift) or currentSpell == _Ebonbolt
+	) then
 		return _GlacialSpike;
 	end
 
 	return _Frostbolt;
 end
 
-function MaxDps.Mage.ArcaneCharge()
+function Mage:ArcaneCharge()
 	local _, _, _, charges = UnitAura('player', 'Arcane Charge', nil, 'PLAYER|HARMFUL');
 	if charges == nil then
 		charges = 0;
@@ -367,6 +387,6 @@ function MaxDps.Mage.ArcaneCharge()
 	return charges;
 end
 
-function MaxDps.Mage.Ignite()
+function Mage:Ignite()
 	return select(15, UnitAura('target', 'Ignite', nil, 'HARMFUL'));
 end
