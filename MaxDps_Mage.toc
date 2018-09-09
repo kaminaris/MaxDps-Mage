@@ -4,5 +4,7 @@
 ## Interface: 80000
 ## Dependencies: MaxDps
 ## LoadOnDemand: 1
+## X-Curse-Project-ID: 99327
+## X-WoWI-ID: 24643
 
 main.lua
