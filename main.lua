@@ -310,9 +310,10 @@ function Mage:Frost(timeShift, currentSpell, gcd, talents)
 		iciCharges = iciCharges + 1;
 	end
 
+	local frozenOrb = MaxDps:FindSpell(198149) and 198149 or _FrozenOrb;
+
 	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
 	MaxDps:GlowCooldown(_IcyVeins, MaxDps:SpellAvailable(_IcyVeins, timeShift));
-
 
 	if not talents[_LonelyWinter] and not UnitExists('pet')
 		and MaxDps:SpellAvailable(_SummonWaterElemental, timeShift)
@@ -342,8 +343,8 @@ function Mage:Frost(timeShift, currentSpell, gcd, talents)
 		return _Flurry;
 	end
 
-	if MaxDps:SpellAvailable(_FrozenOrb, timeShift) then
-		return _FrozenOrb;
+	if MaxDps:SpellAvailable(frozenOrb, timeShift) then
+		return frozenOrb;
 	end
 
 	if MaxDps:Aura(_FingersofFrost, timeShift) then
@@ -358,14 +359,16 @@ function Mage:Frost(timeShift, currentSpell, gcd, talents)
 		return _CometStorm;
 	end
 
-	if not talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and currentSpell ~= _Ebonbolt then
-		return _Ebonbolt;
-	end
+	if talents[_Ebonbolt] then
+		if not talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and currentSpell ~= _Ebonbolt then
+			return _Ebonbolt;
+		end
 
-	if talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and iciCharges >= 5
-		and not MaxDps:Aura(_BrainFreeze, timeShift) and currentSpell ~= _Ebonbolt
-	then
-		return _Ebonbolt;
+		if talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and iciCharges >= 5
+			and not MaxDps:Aura(_BrainFreeze, timeShift) and currentSpell ~= _Ebonbolt
+		then
+			return _Ebonbolt;
+		end
 	end
 
 	local targets = MaxDps:TargetsInRange(_IceLance);
