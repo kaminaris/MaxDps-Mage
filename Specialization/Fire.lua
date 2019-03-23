@@ -1,36 +1,10 @@
+local _, addonTable = ...;
+
 --- @type MaxDps
-if not MaxDps then
-	return ;
-end
+if not MaxDps then return end
+
+local Mage = addonTable.Mage;
 local MaxDps = MaxDps;
-local UnitPower = UnitPower;
-local EnumPowerType = Enum.PowerType;
-local UnitExists = UnitExists;
-
-local Mage = MaxDps:NewModule('Mage', 'AceEvent-3.0');
-
--- Fire
-
-local _Meteor = 153561;
-local _Pyroclasm = 269651;
-local _PhoenixFlames = 257541;
-local _Flamestrike = 2120;
-local _FlamePatch = 205037;
-local _LivingBomb = 44457;
-local _DragonsBreath = 31661;
-local _FireBlast = 108853;
-local _Scorch = 2948;
-local _SearingTouch = 269644;
-local _Fireball = 133;
-local _AlexstraszasFury = 235870;
-local _Ignite = 12654;
-local _Pyroblast = 11366;
-local _BlastWave = 157981;
-local _FrostNova = 122;
-local _Kindling = 155148;
-local _BlazingBarrier = 235313;
-local _Firestarter = 205026;
-local _Pyromaniac = 205020;
 
 local FR = {
 	ArcaneIntellect   = 1459,
@@ -59,215 +33,13 @@ local FR = {
 	BlasterMasterAura = 274598,
 };
 
--- Frost
-
-local _Frostbolt = 116;
-local _FingersofFrost = 44544;
-local _IceLance = 30455;
-local _BrainFreeze = 190446;
-local _GlacialSpike = 199786;
-local _Flurry = 44614;
-local _IcyVeins = 12472;
-local _FrozenOrb = 84714;
-local _RayofFrost = 205021;
-local _Ebonbolt = 257537;
-local _CometStorm = 153595;
-local _IceNova = 157997;
-local _Blizzard = 190356;
-local _FreezingRain = 270233;
-local _WintersReach = 273346;
-local _Shatter = 12982;
-local _Freeze = 231596;
-local _ConeofCold = 120;
-local _IceFloes = 108839;
-local _LonelyWinter = 205024;
-local _SummonWaterElemental = 31687;
-local _Icicles = 205473;
-local _SplittingIce = 56377;
-
-local _SpellWhitelist = {
-	[_Frostbolt]    = 1,
-	[_Ebonbolt]     = 1,
-	[_Flurry]       = 1,
-	[_IceLance]     = 1,
-	[_FrozenOrb]    = 1,
-	[_RayofFrost]   = 1,
-	[_GlacialSpike] = 1,
-};
-
--- Arcane
-
-local _Evocation = 12051;
-local _ArcanePower = 12042;
-local _Overpowered = 155147;
-local _ArcaneOrb = 153626;
-local _NetherTempest = 114923;
-local _ArcaneBlast = 30451;
-local _RuleofThrees = 264774;
-local _PresenceofMind = 205025;
-local _ArcaneBarrage = 44425;
-local _ArcaneExplosion = 1449;
-local _ArcaneMissiles = 5143;
-local _Clearcasting = 263725;
-local _Amplification = 236628;
-local _ChargedUp = 205032;
-local _Supernova = 157980;
-local _DrainSoul = 198590;
-local _Resonance = 205028;
-local _Displacement = 195676;
-
--- Shared
-
-local _MirrorImage = 55342;
-local _RuneofPower = 116011;
-
 local A = {
 	BlasterMaster = 274596,
 }
 
-local spellMeta = {
-	__index = function(t, k)
-		print('Spell Key ' .. k .. ' not found!');
-	end
-}
 
-setmetatable(A, spellMeta);
-setmetatable(FR, spellMeta);
-
-function Mage:Enable()
-	if MaxDps.Spec == 1 then
-		MaxDps:Print(MaxDps.Colors.Info .. 'Mage - Arcane');
-		MaxDps.NextSpell = Mage.Arcane;
-	elseif MaxDps.Spec == 2 then
-		MaxDps:Print(MaxDps.Colors.Info .. 'Mage - Fire');
-		MaxDps.NextSpell = Mage.Fire;
-	elseif MaxDps.Spec == 3 then
-		MaxDps:Print(MaxDps.Colors.Info .. 'Mage - Frost');
-		MaxDps.NextSpell = Mage.Frost;
-		self:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED')
-	end
-
-	return true;
-end
-
-function Mage:Disable()
-	self:UnregisterAllEvents();
-end
-
-function Mage:UNIT_SPELLCAST_SUCCEEDED(event, unitID, spell, spellId)
-	if unitID == 'player' and _SpellWhitelist[spellId] == 1 then
-		Mage.lastSpell = spellId;
-	end
-end
-
-function Mage:Arcane(timeShift, currentSpell, gcd, talents)
-	-- Ressource
-	local arcaneCharge = UnitPower('player', Enum.PowerType.ArcaneCharges);
-	local mana = UnitPower('player', Enum.PowerType.Mana);
-	local maxMana = UnitPowerMax('player', Enum.PowerType.Mana);
-	local manaPct = mana / maxMana;
-
-	if currentSpell == _ArcaneBlast then
-		arcaneCharge = arcaneCharge + 1;
-	end
-
-	local ap, apCd = MaxDps:Aura(_ArcanePower, timeShift);
-	local rop = MaxDps:Aura(_RuneofPower);
-	local _, ropCharges, ropCd = MaxDps:SpellCharges(_RuneofPower, timeShift);
-
-	-- image
-	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
-
-	local burnCond = MaxDps:SpellAvailable(_ArcanePower, timeShift) and arcaneCharge >= 4 and
-		(ropCharges >= 1 or not talents[_RuneofPower]) and
-		((talents[_Overpowered] and manaPct > 0.3) or manaPct > 0.5);
-
-	MaxDps:GlowCooldown(_ArcanePower, burnCond);
-
-	-- burn
-	if MaxDps:SpellAvailable(_Evocation, timeShift) then
-
-		if manaPct < 0.05 then
-			return _Evocation;
-		end
-
-		if talents[_ChargedUp] and MaxDps:SpellAvailable(_ChargedUp, timeShift) and arcaneCharge <= 1 then
-			return _ChargedUp;
-		end
-
-		if talents[_ArcaneOrb] and MaxDps:SpellAvailable(_ArcaneOrb, timeShift) and arcaneCharge < 4 then
-			return _ArcaneOrb;
-		end
-
-		if talents[_NetherTempest] and not ap and not rop and not MaxDps:TargetAura(_NetherTempest, timeShift + 3)
-			and arcaneCharge >= 4 then
-			return _NetherTempest;
-		end
-
-		if talents[_RuleofThrees] and talents[_Overpowered] and MaxDps:Aura(_RuleofThrees, timeShift) and
-			currentSpell ~= _ArcaneBlast then
-			return _ArcaneBlast;
-		end
-
-		if talents[_RuneofPower] and ropCharges > 1.6 then
-			return _RuneofPower;
-		end
-
-		local pom, pomCd = MaxDps:SpellAvailable(_PresenceofMind, timeShift);
-		if pom and apCd < 2 and not MaxDps:Aura(_PresenceofMind, timeShift) then
-			return _PresenceofMind;
-		end
-
-		local cc = MaxDps:Aura(_Clearcasting, timeShift);
-		local am = MaxDps:SpellAvailable(_ArcaneMissiles, timeShift);
-
-		if talents[_Amplification] and cc and am and currentSpell ~= _ArcaneMissiles then
-			return _ArcaneMissiles;
-		end
-
-		if am and cc and not ap and manaPct < 0.95 and currentSpell ~= _ArcaneMissiles then
-			return _ArcaneMissiles;
-		end
-
-		return _ArcaneBlast;
-	end
-
-	if talents[_ChargedUp] and MaxDps:SpellAvailable(_ChargedUp, timeShift) and arcaneCharge == 0 then
-		return _ChargedUp;
-	end
-
-	if talents[_NetherTempest] and not MaxDps:TargetAura(_NetherTempest, timeShift + 3) and arcaneCharge >= 4 then
-		return _NetherTempest;
-	end
-
-	if talents[_ArcaneOrb] and MaxDps:SpellAvailable(_ArcaneOrb, timeShift) and arcaneCharge < 4 then
-		return _ArcaneOrb;
-	end
-
-	if talents[_RuneofPower] and ropCharges > 1.8 and currentSpell ~= _RuneofPower then
-		return _RuneofPower;
-	end
-
-	if talents[_RuleofThrees] and MaxDps:Aura(_RuleofThrees, timeShift) then
-		return _ArcaneBlast;
-	end
-
-	if MaxDps:Aura(_Clearcasting, timeShift) and MaxDps:SpellAvailable(_ArcaneMissiles, timeShift) and
-		currentSpell ~= _ArcaneMissiles
-	then
-		return _ArcaneMissiles;
-	end
-
-	if manaPct < 0.6 and arcaneCharge >= 4 then
-		return _ArcaneBarrage;
-	end
-
-	if talents[_Supernova] and MaxDps:SpellAvailable(_Supernova, timeShift) then
-		return _Supernova;
-	end
-
-	return _ArcaneBlast;
-end
+setmetatable(FR, Mage.spellMeta);
+setmetatable(A, Mage.spellMeta);
 
 function Mage:Fire()
 	local fd = MaxDps.FrameData;
@@ -297,13 +69,13 @@ function Mage:Fire()
 	if talents[FR.RuneOfPower] then
 		MaxDps:GlowCooldown(FR.RuneOfPower,
 			cooldown[FR.RuneOfPower].ready and
-			currentSpell ~= FR.RuneOfPower and
-			(
-				talents[FR.Firestarter] and firestarterActive or
-				cooldown[FR.Combustion].remains > combustionRopCutoff and not buff[FR.Combustion].up or
-				cooldown[FR.Combustion].ready or
-				timeToDie < cooldown[FR.Combustion].remains and not buff[FR.Combustion].up
-			)
+				currentSpell ~= FR.RuneOfPower and
+				(
+					talents[FR.Firestarter] and firestarterActive or
+						cooldown[FR.Combustion].remains > combustionRopCutoff and not buff[FR.Combustion].up or
+						cooldown[FR.Combustion].ready or
+						timeToDie < cooldown[FR.Combustion].remains and not buff[FR.Combustion].up
+				)
 		);
 	end
 
@@ -353,10 +125,10 @@ function Mage:FireActiveTalents()
 	-- meteor,if=buff.rune_of_power.up&(firestarter.remains>cooldown.meteor.duration|!firestarter.active)|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|(cooldown.meteor.duration<cooldown.combustion.remains|cooldown.combustion.ready)&!talent.rune_of_power.enabled&(cooldown.meteor.duration<firestarter.remains|!talent.firestarter.enabled|!firestarter.active);
 	if talents[FR.Meteor] and cooldown[FR.Meteor].ready and (
 		buff[FR.RuneOfPowerAura].up and not firestarterActive or
-		cooldown[FR.RuneOfPower].remains > timeToDie and cooldown[FR.RuneOfPower].charges < 1 or
-		(cooldown[FR.Meteor].duration < cooldown[FR.Combustion].remains or cooldown[FR.Combustion].ready) and
-		not talents[FR.RuneOfPower] and
-		(not talents[FR.Firestarter] or not firestarterActive)
+			cooldown[FR.RuneOfPower].remains > timeToDie and cooldown[FR.RuneOfPower].charges < 1 or
+			(cooldown[FR.Meteor].duration < cooldown[FR.Combustion].remains or cooldown[FR.Combustion].ready) and
+				not talents[FR.RuneOfPower] and
+				(not talents[FR.Firestarter] or not firestarterActive)
 	) then
 		return FR.Meteor;
 	end
@@ -385,7 +157,7 @@ function Mage:FireBmCombustionPhase()
 		not buff[FR.BlasterMasterAura].up and
 		(
 			talents[FR.RuneOfPower] and currentSpell == FR.RuneOfPower or
-			(cooldown[FR.Combustion].ready or buff[FR.Combustion].up) and not talents[FR.RuneOfPower]
+				(cooldown[FR.Combustion].ready or buff[FR.Combustion].up) and not talents[FR.RuneOfPower]
 		)
 	then
 		return FR.FireBlast;
@@ -445,11 +217,11 @@ function Mage:FireBmCombustionPhase()
 	-- fire_blast,use_while_casting=1,use_off_gcd=1,if=buff.blaster_master.stack>1&(prev_gcd.1.scorch&!buff.hot_streak.up&!action.scorch.executing|buff.blaster_master.remains<0.15);
 	if cooldown[FR.FireBlast].ready and (
 		buff[FR.BlasterMasterAura].count > 1 and
-		(
-			currentSpell == FR.Scorch and
-			not buff[FR.HotStreak].up or
-			buff[FR.BlasterMasterAura].remains < 0.3
-		)
+			(
+				currentSpell == FR.Scorch and
+					not buff[FR.HotStreak].up or
+					buff[FR.BlasterMasterAura].remains < 0.3
+			)
 	) then
 		return FR.FireBlast;
 	end
@@ -512,10 +284,10 @@ function Mage:FireCombustionPhase()
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)));
 	if cooldown[FR.FireBlast].ready and (
 		(azerite[A.BlasterMaster] == 0 or not talents[FR.FlameOn]) and
-		(
-			buff[FR.Combustion].up and (buff[FR.HeatingUp].up and currentSpell ~= FR.Scorch) or
-			(currentSpell == FR.Scorch and not buff[FR.HeatingUp].up and not buff[FR.HotStreak].up)
-		)
+			(
+				buff[FR.Combustion].up and (buff[FR.HeatingUp].up and currentSpell ~= FR.Scorch) or
+					(currentSpell == FR.Scorch and not buff[FR.HeatingUp].up and not buff[FR.HotStreak].up)
+			)
 	) then
 		return FR.FireBlast;
 	end
@@ -533,7 +305,7 @@ function Mage:FireCombustionPhase()
 	-- scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down;
 	if currentSpell ~= FR.Scorch and (
 		buff[FR.Combustion].remains > 1.5 and buff[FR.Combustion].up or
-		not buff[FR.Combustion].up
+			not buff[FR.Combustion].up
 	) then -- 100 OK
 		return FR.Scorch;
 	end
@@ -587,18 +359,18 @@ function Mage:FireRopPhase()
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)|(talent.firestarter.enabled&firestarter.active)));
 	if cooldown[FR.FireBlast].ready and (
 		(cooldown[FR.Combustion].remains > 0 or firestarterActive and buff[FR.RuneOfPowerAura].up) and
-		(
-			not buff[FR.HeatingUp].up and
-			not buff[FR.HotStreak].up and
-			not spellHistory[1] == FR.FireBlast and
 			(
-				cooldown[FR.FireBlast].charges >= 2 or
-				(cooldown[FR.PhoenixFlames].charges >= 1 and talents[FR.PhoenixFlames]) or
-				(talents[FR.AlexstraszasFury] and cooldown[FR.DragonsBreath].ready) or
-				(talents[FR.SearingTouch] and targetHp <= 30) or
-				(talents[FR.Firestarter] and firestarterActive)
+				not buff[FR.HeatingUp].up and
+					not buff[FR.HotStreak].up and
+					not spellHistory[1] == FR.FireBlast and
+					(
+						cooldown[FR.FireBlast].charges >= 2 or
+							(cooldown[FR.PhoenixFlames].charges >= 1 and talents[FR.PhoenixFlames]) or
+							(talents[FR.AlexstraszasFury] and cooldown[FR.DragonsBreath].ready) or
+							(talents[FR.SearingTouch] and targetHp <= 30) or
+							(talents[FR.Firestarter] and firestarterActive)
+					)
 			)
-		)
 	) then
 		return FR.FireBlast;
 	end
@@ -743,11 +515,11 @@ function Mage:FireStandardRotation()
 	-- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling;
 	if talents[FR.PhoenixFlames] and (
 		buff[FR.HeatingUp].up or
-		(
-			not buff[FR.HotStreak].up and (
-				cooldown[FR.FireBlast].charges > 0 or talents[FR.SearingTouch] and targetHp <= 30
+			(
+				not buff[FR.HotStreak].up and (
+					cooldown[FR.FireBlast].charges > 0 or talents[FR.SearingTouch] and targetHp <= 30
+				)
 			)
-		)
 	) then
 		return FR.PhoenixFlames;
 	end
@@ -773,96 +545,4 @@ function Mage:FireStandardRotation()
 
 	-- scorch;
 	return FR.Scorch;
-end
-
-function Mage:Frost(timeShift, currentSpell, gcd, talents)
-	local rop = MaxDps:Aura(_RuneofPower);
-	local ici, iciCharges = MaxDps:Aura(_Icicles, timeShift);
-
-	if currentSpell == _Frostbolt then
-		iciCharges = iciCharges + 1;
-	end
-
-	local frozenOrb = MaxDps:FindSpell(198149) and 198149 or _FrozenOrb;
-
-	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and MaxDps:SpellAvailable(_MirrorImage, timeShift));
-	MaxDps:GlowCooldown(_IcyVeins, MaxDps:SpellAvailable(_IcyVeins, timeShift));
-
-	if not talents[_LonelyWinter] and not UnitExists('pet')
-		and MaxDps:SpellAvailable(_SummonWaterElemental, timeShift)
-		and currentSpell ~= _SummonWaterElemental
-	then
-		return _SummonWaterElemental;
-	end
-
-	--Ice Lance after every Flurry cast. @TODO
-	if Mage.lastSpell == _Flurry or currentSpell == _Flurry then
-		return _IceLance;
-	end
-
-	if MaxDps:Aura(_BrainFreeze, timeShift) and
-		(
-			talents[_GlacialSpike] and (
-				(iciCharges >= 5 and currentSpell == _GlacialSpike) or
-				(iciCharges <= 3 and currentSpell == _Frostbolt)
-			)
-				or
-			not talents[_GlacialSpike] and (
-				currentSpell == _Ebonbolt or
-				currentSpell == _Frostbolt
-			)
-		)
-	then
-		return _Flurry;
-	end
-
-	if MaxDps:SpellAvailable(frozenOrb, timeShift) then
-		return frozenOrb;
-	end
-
-	if MaxDps:Aura(_FingersofFrost, timeShift) then
-		return _IceLance;
-	end
-
-	if talents[_RayofFrost] and MaxDps:SpellAvailable(_RayofFrost, timeShift) and currentSpell ~= _RayofFrost then
-		return _RayofFrost;
-	end
-
-	if talents[_CometStorm] and MaxDps:SpellAvailable(_CometStorm, timeShift) then
-		return _CometStorm;
-	end
-
-	if talents[_Ebonbolt] then
-		if not talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and currentSpell ~= _Ebonbolt then
-			return _Ebonbolt;
-		end
-
-		if talents[_GlacialSpike] and MaxDps:SpellAvailable(_Ebonbolt, timeShift) and iciCharges >= 5
-			and not MaxDps:Aura(_BrainFreeze, timeShift) and currentSpell ~= _Ebonbolt
-		then
-			return _Ebonbolt;
-		end
-	end
-
-	local targets = MaxDps:TargetsInRange(_IceLance);
-	if talents[_GlacialSpike] and MaxDps:SpellAvailable(_GlacialSpike, timeShift) and iciCharges >= 5 and
-		currentSpell ~= _GlacialSpike and (
-		(talents[_SplittingIce] and targets >= 2) or MaxDps:Aura(_BrainFreeze, timeShift) or currentSpell == _Ebonbolt
-	) then
-		return _GlacialSpike;
-	end
-
-	return _Frostbolt;
-end
-
-function Mage:ArcaneCharge()
-	local _, _, _, charges = UnitAura('player', 'Arcane Charge', nil, 'PLAYER|HARMFUL');
-	if charges == nil then
-		charges = 0;
-	end
-	return charges;
-end
-
-function Mage:Ignite()
-	return select(15, UnitAura('target', 'Ignite', nil, 'HARMFUL'));
 end
