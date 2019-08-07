@@ -114,7 +114,7 @@ function Mage:FireActiveTalents()
 	local firestarterActive = fd.firestarterActive;
 
 	-- living_bomb,if=active_enemies>1&buff.combustion.down&(cooldown.combustion.remains>cooldown.living_bomb.duration|cooldown.combustion.ready);
-	if cooldown[FR.LivingBomb].ready and
+	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and
 		targets > 1 and
 		not buff[FR.Combustion].up and
 		(cooldown[FR.Combustion].remains > cooldown[FR.LivingBomb].duration or cooldown[FR.Combustion].ready)
@@ -148,7 +148,7 @@ function Mage:FireBmCombustionPhase()
 	local gcdRemains = fd.gcdRemains;
 
 	-- living_bomb,if=buff.combustion.down&active_enemies>1;
-	if cooldown[FR.LivingBomb].ready and not buff[FR.Combustion].up and targets > 1 then
+	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and not buff[FR.Combustion].up and targets > 1 then
 		return FR.LivingBomb;
 	end
 
@@ -227,7 +227,7 @@ function Mage:FireBmCombustionPhase()
 	end
 
 	-- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1;
-	if cooldown[FR.LivingBomb].ready and buff[FR.Combustion].remains < gcd and targets > 1 then
+	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and buff[FR.Combustion].remains < gcd and targets > 1 then
 		return FR.LivingBomb;
 	end
 
@@ -311,7 +311,7 @@ function Mage:FireCombustionPhase()
 	end
 
 	-- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1;
-	if cooldown[FR.LivingBomb].ready and buff[FR.Combustion].remains < gcd and targets > 1 then -- 100 OK
+	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and buff[FR.Combustion].remains < gcd and targets > 1 then -- 100 OK
 		return FR.LivingBomb;
 	end
 
