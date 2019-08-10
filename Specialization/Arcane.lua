@@ -54,6 +54,8 @@ function Mage:Arcane()
 	local rop = buff[_RuneOfPower].up;
 	local ropCharges = cooldown[_RuneOfPower].charges;
 
+	MaxDps:GlowEssences();
+
 	-- image
 	MaxDps:GlowCooldown(_MirrorImage, talents[_MirrorImage] and cooldown[_MirrorImage].ready);
 

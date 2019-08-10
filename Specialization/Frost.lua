@@ -86,6 +86,7 @@ function Mage:Frost()
 	fd.targets = targets;
 	fd.canRop = canRop;
 
+	MaxDps:GlowEssences();
 	MaxDps:GlowCooldown(FT.MirrorImage, talents[FT.MirrorImage] and cooldown[FT.MirrorImage].ready);
 	MaxDps:GlowCooldown(FT.IcyVeins, cooldown[FT.IcyVeins].ready);
 

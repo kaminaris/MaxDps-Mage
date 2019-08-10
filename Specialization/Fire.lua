@@ -60,6 +60,8 @@ function Mage:Fire()
 	fd.targetHp = targetHp;
 	fd.combustionRopCutoff = combustionRopCutoff;
 
+	MaxDps:GlowEssences();
+
 	-- mirror_image,if=buff.combustion.down;
 	if talents[FR.MirrorImage] then
 		MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
