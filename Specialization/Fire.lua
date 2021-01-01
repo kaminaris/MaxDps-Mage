@@ -31,12 +31,35 @@ local FR = {
 	Fireball          = 133,
 	Kindling          = 155148,
 	BlasterMasterAura = 274598,
+	TimeWarp          = 80353,
 };
+
+local CN = {
+	None      = 0,
+	Kyrian    = 1,
+	Venthyr   = 2,
+	NightFae  = 3,
+	Necrolord = 4
+};
+
+-- Covenant abilities	
+local C = {
+	-- Buttons
+	ClassAbility = 313347,
+	SignatureAbility = 326526,
+	-- Kyrian
+	RadiantSpark = 307443,
+	-- Necrolord
+	Deathborne = 324220,
+	-- Night Fae
+	ShiftingPower = 314791,
+	-- Venthyr
+  MirrorsOfTorment = 314793,
+}
 
 local A = {
 	BlasterMaster = 274596,
 }
-
 
 setmetatable(FR, Mage.spellMeta);
 setmetatable(A, Mage.spellMeta);
@@ -45,6 +68,7 @@ function Mage:Fire()
 	local fd = MaxDps.FrameData;
 	local cooldown = fd.cooldown;
 	local azerite = fd.azerite;
+	local covenant = fd.covenant.covenantId;
 	local buff = fd.buff;
 	local currentSpell = fd.currentSpell;
 	local talents = fd.talents;
@@ -62,10 +86,46 @@ function Mage:Fire()
 
 	MaxDps:GlowEssences();
 
+	-- If NightFae covenant, use ShiftingPower as a cooldown
+	MaxDps:GlowCooldown(
+		C.ShiftingPower, 
+		covenant == CN.NightFae and 
+			cooldown[C.ShiftingPower].ready and
+				not buff[FR.HeatingUp].up and 
+					not buff[FR.HotStreak].up and
+						not buff[FR.Combustion].up and 
+							not buff[FR.RuneOfPowerAura].up
+	);
+	MaxDps:GlowCooldown(
+		C.Deathborne, 
+		covenant == CN.Necrolord and 
+			cooldown[C.Deathborne].ready and
+				not buff[FR.HeatingUp].up and 
+					not buff[FR.HotStreak].up and
+						not buff[FR.Combustion].up and 
+							not buff[FR.RuneOfPowerAura].up
+	);
+	MaxDps:GlowCooldown(
+		C.RadiantSpark, 
+		covenant == CN.Kyrian and 
+			cooldown[C.RadiantSpark].ready and
+				not buff[FR.HeatingUp].up and 
+					not buff[FR.HotStreak].up and
+						not buff[FR.Combustion].up and 
+							not buff[FR.RuneOfPowerAura].up
+	);
+	MaxDps:GlowCooldown(
+		C.MirrorsOfTorment, 
+		covenant == CN.Venthyr and 
+			cooldown[C.MirrorsOfTorment].ready and
+				not buff[FR.HeatingUp].up and 
+					not buff[FR.HotStreak].up and
+						not buff[FR.Combustion].up and 
+							not buff[FR.RuneOfPowerAura].up
+	);
+
 	-- mirror_image,if=buff.combustion.down;
-	if talents[FR.MirrorImage] then
-		MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
-	end
+  MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
 
 	-- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down;
 	if talents[FR.RuneOfPower] then
@@ -81,11 +141,11 @@ function Mage:Fire()
 		);
 	end
 
-	-- combustion,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&((action.meteor.in_flight&action.meteor.in_flight_remains<0.2)|!talent.meteor.enabled|prev_gcd.1.meteor)&(buff.rune_of_power.up|!talent.rune_of_power.enabled);
+	-- only use combustion if you have enough charges to support it
 	MaxDps:GlowCooldown(FR.Combustion,
-		cooldown[FR.Combustion].ready and (
-			buff[FR.RuneOfPowerAura].up or currentSpell == FR.RuneOfPower or not talents[FR.RuneOfPower]
-		)
+		cooldown[FR.Combustion].ready and 
+			cooldown[FR.FireBlast].charges > 2 and
+			cooldown[FR.PhoenixFlames].charges > 1
 	);
 
 
@@ -185,7 +245,7 @@ function Mage:FireBmCombustionPhase()
 	end
 
 	-- phoenix_flames;
-	if talents[FR.PhoenixFlames] and cooldown[FR.PhoenixFlames].ready then
+	if cooldown[FR.PhoenixFlames].ready then
 		return FR.PhoenixFlames;
 	end
 
@@ -300,7 +360,7 @@ function Mage:FireCombustionPhase()
 	end
 
 	-- phoenix_flames;
-	if talents[FR.PhoenixFlames] and cooldown[FR.PhoenixFlames].ready then -- 100 OK
+	if cooldown[FR.PhoenixFlames].ready then -- 100 OK
 		return FR.PhoenixFlames;
 	end
 
@@ -367,7 +427,7 @@ function Mage:FireRopPhase()
 					not spellHistory[1] == FR.FireBlast and
 					(
 						cooldown[FR.FireBlast].charges >= 2 or
-							(cooldown[FR.PhoenixFlames].charges >= 1 and talents[FR.PhoenixFlames]) or
+							(cooldown[FR.PhoenixFlames].charges >= 1) or
 							(talents[FR.AlexstraszasFury] and cooldown[FR.DragonsBreath].ready) or
 							(talents[FR.SearingTouch] and targetHp <= 30) or
 							(talents[FR.Firestarter] and firestarterActive)
@@ -420,9 +480,8 @@ function Mage:FireRopPhase()
 	end
 
 	-- phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react;
-	if talents[FR.PhoenixFlames] and
-		not spellHistory[1] == FR.PhoenixFlames and
-		buff[FR.HeatingUp].up
+	if not spellHistory[1] == FR.PhoenixFlames and
+	  buff[FR.HeatingUp].up
 	then
 		return FR.PhoenixFlames;
 	end
@@ -481,7 +540,7 @@ function Mage:FireStandardRotation()
 	-- pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight);
 	if currentSpell ~= FR.Pyroblast and
 		buff[FR.HotStreak].up and
-		(currentSpell == FR.Fireball or firestarterActive)
+		(currentSpell == FR.Fireball or firestarterActive or not currentSpell)
 	then
 		return FR.Pyroblast;
 	end
@@ -515,7 +574,7 @@ function Mage:FireStandardRotation()
 	end
 
 	-- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling;
-	if talents[FR.PhoenixFlames] and cooldown[FR.PhoenixFlames].ready and (
+	if cooldown[FR.PhoenixFlames].ready and (
 		buff[FR.HeatingUp].up or
 			(
 				not buff[FR.HotStreak].up and (
