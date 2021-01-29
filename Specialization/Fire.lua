@@ -208,8 +208,6 @@ function Mage:FireCombustionPhase()
 	local targetHp = fd.targetHp;
 	local gcd = fd.gcd;
 
-	print('Combustion Phase')
-
 	-- call_action_list,name=active_talents;
 	local result = Mage:FireActiveTalents();
 	if result then return result; end
@@ -289,7 +287,6 @@ function Mage:FireRopPhase()
 	local targetHp = fd.targetHp;
 	local firestarterActive = fd.firestarterActive;
 
-	print('Rop Phase')
 	-- flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>4)&buff.hot_streak.react;
 	if currentSpell ~= FR.Flamestrike and
 		((talents[FR.FlamePatch] and targets > 1) or targets > 4) and
@@ -409,7 +406,6 @@ function Mage:FireStandardRotation()
 
 	local playerMoving = GetUnitSpeed('player') > 0;
 
-	print('Std Phase')
 	-- flamestrike,if=((talent.flame_patch.enabled&active_enemies>1&!firestarter.active)|active_enemies>4)&buff.hot_streak.react;
 	if currentSpell ~= FR.Flamestrike and
 		((talents[FR.FlamePatch] and targets > 1 and not firestarterActive) or targets > 4) and
