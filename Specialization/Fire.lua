@@ -437,7 +437,7 @@ function Mage:FireStandardRotation()
 	end
 
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0&buff.rune_of_power.down|firestarter.active)&!talent.kindling.enabled&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&(buff.heating_up.react|firestarter.active&!buff.hot_streak.react&!buff.heating_up.react))|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight))|(firestarter.active&(action.pyroblast.in_flight|action.fireball.in_flight)&!buff.heating_up.react&!buff.hot_streak.react));
-	if (cooldown[FR.Combustion].remains > 25 and (cooldown[FR.FireBlast].ready and buff[FR.HeatingUp].up or cooldown[FR.FireBlast].charges >= 2.6)) or
+	if (cooldown[FR.Combustion].remains > 25 and (cooldown[FR.FireBlast].ready and buff[FR.HeatingUp].up or cooldown[FR.FireBlast].charges >= 2.8)) or
 		((cooldown[FR.Combustion].remains > 16.5 and cooldown[FR.Combustion].remains < 25) and cooldown[FR.FireBlast].charges >= 1.8 and buff[FR.HeatingUp].up) or
 		((cooldown[FR.Combustion].remains > 8.6 and cooldown[FR.Combustion].remains < 16.5) and cooldown[FR.FireBlast].charges >= 2.8 and buff[FR.HeatingUp].up)
 	then
