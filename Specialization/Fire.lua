@@ -305,7 +305,7 @@ function Mage:FireRopPhase()
 
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)|(talent.firestarter.enabled&firestarter.active)));
 	if cooldown[FR.FireBlast].ready and (
-		(cooldown[FR.Combustion].remains > 0 or firestarterActive and buff[FR.RuneOfPowerAura].up) and
+		(cooldown[FR.Combustion].remains > 0 or firestarterActive) and
 			(
 				not buff[FR.HeatingUp].up and
 					not buff[FR.HotStreak].up and
@@ -337,7 +337,7 @@ function Mage:FireRopPhase()
 
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled));
 	if cooldown[FR.FireBlast].ready and
-		(cooldown[FR.Combustion].remains > 0 or firestarterActive and buff[FR.RuneOfPowerAura].up) and
+		(cooldown[FR.Combustion].remains > 0 or firestarterActive ) and
 		(buff[FR.HeatingUp].up and (targetHp >= 30 or not talents[FR.SearingTouch]))
 	then
 		return FR.FireBlast;
@@ -345,7 +345,7 @@ function Mage:FireRopPhase()
 
 	-- fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react);
 	if cooldown[FR.FireBlast].ready and
-		(cooldown[FR.Combustion].remains > 0 or firestarterActive and buff[FR.RuneOfPowerAura].up) and
+		(cooldown[FR.Combustion].remains > 0 or firestarterActive ) and
 		talents[FR.SearingTouch] and
 		targetHp <= 30 and
 		(buff[FR.HeatingUp].up and not currentSpell == FR.Scorch or not buff[FR.HeatingUp].up and not buff[FR.HotStreak].up)
