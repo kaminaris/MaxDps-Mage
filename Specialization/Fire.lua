@@ -5,6 +5,8 @@ if not MaxDps then return end
 
 local Mage = addonTable.Mage;
 local MaxDps = MaxDps;
+local UnitHealth = UnitHealth;
+local UnitHealthMax = UnitHealthMax;
 
 local FR = {
 	ArcaneIntellect   = 1459,
@@ -54,7 +56,7 @@ local C = {
 	-- Night Fae
 	ShiftingPower = 314791,
 	-- Venthyr
-  MirrorsOfTorment = 314793,
+    MirrorsOfTorment = 314793,
 }
 
 local A = {
@@ -79,6 +81,9 @@ function Mage:Fire()
 	local targets = MaxDps:SmartAoe();
 	local combustionRopCutoff = 60;
 	local firestarterActive = talents[FR.Firestarter] and targetHp > 90;
+    local health = UnitHealth('player')
+	local healthMax = UnitHealthMax('player');
+	local healthPercent = ( health / healthMax ) * 100
 
 	fd.targets = targets;
 	fd.targetHp = targetHp;
@@ -123,9 +128,8 @@ function Mage:Fire()
 						not buff[FR.Combustion].up and 
 							not buff[FR.RuneOfPowerAura].up
 	);
-
-	-- mirror_image,if=buff.combustion.down;
-	MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
+	-- mirror_image,if=buff.combustion.down; isnt a dps CD so only use on lower then 50% life
+	MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up and healthPercent < 50);
 
 	-- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down;
 	if talents[FR.RuneOfPower] then
