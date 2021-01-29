@@ -143,8 +143,8 @@ function Mage:Fire()
 	-- only use combustion if you have enough charges to support it
 	MaxDps:GlowCooldown(FR.Combustion,
 		cooldown[FR.Combustion].ready and
-			cooldown[FR.FireBlast].charges > 2 and
-			cooldown[FR.PhoenixFlames].charges > 2
+			cooldown[FR.FireBlast].charges > 2.5 and
+			cooldown[FR.PhoenixFlames].charges > 2.75
 	);
 
 
@@ -254,8 +254,7 @@ function Mage:FireCombustionPhase()
 	-- scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down;
 	if currentSpell ~= FR.Scorch and (
 		buff[FR.Combustion].remains > 1.5 and buff[FR.Combustion].up or
-			not buff[FR.Combustion].up
-	) then -- 100 OK
+			not buff[FR.Combustion].up ) then -- 100 OK
 		return FR.Scorch;
 	end
 
@@ -361,10 +360,9 @@ function Mage:FireRopPhase()
 		return FR.Pyroblast;
 	end
 
-	-- phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react;
-	if not spellHistory[1] == FR.PhoenixFlames and
-	  buff[FR.HeatingUp].up
-	then
+	-- phoenix_flames, only if we have 3 charges and Combust not ready in less then 25 sec, to prevent cap!
+	if cooldown[FR.PhoenixFlames].ready and not buff[FR.HotStreak].up and
+		( cooldown[FR.PhoenixFlames].charges == 3 and cooldown[FR.Combustion].remains > 25) then
 		return FR.PhoenixFlames;
 	end
 
@@ -455,15 +453,9 @@ function Mage:FireStandardRotation()
 		return FR.Pyroblast;
 	end
 
-	-- phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling;
-	if cooldown[FR.PhoenixFlames].ready and (
-		buff[FR.HeatingUp].up or
-			(
-				not buff[FR.HotStreak].up and (
-					cooldown[FR.FireBlast].charges > 0 or talents[FR.SearingTouch] and targetHp <= 30
-				)
-			)
-	) then
+	-- phoenix_flames, only if we have 3 charges and Combust not ready in less then 25 sec, to prevent cap!
+	if cooldown[FR.PhoenixFlames].ready and not buff[FR.HotStreak].up and
+		( cooldown[FR.PhoenixFlames].charges == 3 and cooldown[FR.Combustion].remains > 25) then
 		return FR.PhoenixFlames;
 	end
 
