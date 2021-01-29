@@ -125,7 +125,7 @@ function Mage:Fire()
 	);
 
 	-- mirror_image,if=buff.combustion.down;
-  MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
+	MaxDps:GlowCooldown(FR.MirrorImage, cooldown[FR.MirrorImage].ready and not buff[FR.Combustion].up);
 
 	-- rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down;
 	if talents[FR.RuneOfPower] then
@@ -133,9 +133,8 @@ function Mage:Fire()
 			cooldown[FR.RuneOfPower].ready and
 				currentSpell ~= FR.RuneOfPower and
 				(
-					talents[FR.Firestarter] and firestarterActive or
-						cooldown[FR.Combustion].remains > combustionRopCutoff and not buff[FR.Combustion].up or
-						cooldown[FR.Combustion].ready or
+					firestarterActive or
+						(cooldown[FR.Combustion].remains > combustionRopCutoff and not buff[FR.Combustion].up) or
 						timeToDie < cooldown[FR.Combustion].remains and not buff[FR.Combustion].up
 				)
 		);
@@ -143,9 +142,9 @@ function Mage:Fire()
 
 	-- only use combustion if you have enough charges to support it
 	MaxDps:GlowCooldown(FR.Combustion,
-		cooldown[FR.Combustion].ready and 
+		cooldown[FR.Combustion].ready and
 			cooldown[FR.FireBlast].charges > 2 and
-			cooldown[FR.PhoenixFlames].charges > 1
+			cooldown[FR.PhoenixFlames].charges > 2
 	);
 
 
