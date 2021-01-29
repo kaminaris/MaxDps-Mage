@@ -195,112 +195,6 @@ function Mage:FireActiveTalents()
 	end
 end
 
-function Mage:FireBmCombustionPhase()
-	local fd = MaxDps.FrameData;
-	local cooldown = fd.cooldown;
-	local azerite = fd.azerite;
-	local buff = fd.buff;
-	local currentSpell = fd.currentSpell;
-	local talents = fd.talents;
-	local timeShift = fd.timeShift;
-	local targets = fd.targets;
-	local spellHistory = fd.spellHistory;
-	local gcd = fd.gcd;
-	local gcdRemains = fd.gcdRemains;
-
-	-- living_bomb,if=buff.combustion.down&active_enemies>1;
-	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and not buff[FR.Combustion].up and targets > 1 then
-		return FR.LivingBomb;
-	end
-
-	-- fire_blast,use_while_casting=1,if=buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight);
-	if cooldown[FR.FireBlast].ready and
-		not buff[FR.BlasterMasterAura].up and
-		(
-			talents[FR.RuneOfPower] and currentSpell == FR.RuneOfPower or
-				(cooldown[FR.Combustion].ready or buff[FR.Combustion].up) and not talents[FR.RuneOfPower]
-		)
-	then
-		return FR.FireBlast;
-	end
-
-	-- call_action_list,name=active_talents;
-	local result = Mage:FireActiveTalents();
-	if result then return result; end
-
-	-- pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up;
-	if currentSpell ~= FR.Pyroblast and currentSpell == FR.Scorch and buff[FR.HeatingUp].up then
-		return FR.Pyroblast;
-	end
-
-	-- pyroblast,if=buff.hot_streak.up;
-	if currentSpell ~= FR.Pyroblast and buff[FR.HotStreak].up then
-		return FR.Pyroblast;
-	end
-
-	-- pyroblast,if=buff.pyroclasm.react&cast_time<buff.combustion.remains;
-	if currentSpell ~= FR.Pyroblast and buff[FR.Pyroclasm].up and timeShift < buff[FR.Combustion].remains then
-		return FR.Pyroblast;
-	end
-
-	-- phoenix_flames;
-	if cooldown[FR.PhoenixFlames].ready then
-		return FR.PhoenixFlames;
-	end
-
-	-- fire_blast,use_off_gcd=1,if=buff.blaster_master.stack=1&buff.hot_streak.down&!buff.pyroclasm.react&prev_gcd.1.pyroblast&(buff.blaster_master.remains<0.15|gcd.remains<0.15);
-	if cooldown[FR.FireBlast].ready and
-		buff[FR.BlasterMasterAura].count == 1 and
-		not buff[FR.HotStreak].up and
-		not buff[FR.Pyroclasm].up and
-		(spellHistory[1] == FR.Pyroblast or currentSpell == FR.Pyroblast) and
-		(buff[FR.BlasterMasterAura].remains < 0.3)
-	then
-		return FR.FireBlast;
-	end
-
-	-- fire_blast,use_while_casting=1,if=buff.blaster_master.stack=1&(action.scorch.executing&action.scorch.execute_remains<0.15|buff.blaster_master.remains<0.15);
-	if cooldown[FR.FireBlast].ready and
-		buff[FR.BlasterMasterAura].count == 1 and
-		(currentSpell == FR.Scorch or buff[FR.BlasterMasterAura].remains < 0.3)
-	then
-		return FR.FireBlast;
-	end
-
-	-- scorch,if=buff.hot_streak.down&(cooldown.fire_blast.remains<cast_time|action.fire_blast.charges>0);
-	if currentSpell ~= FR.Scorch and
-		not buff[FR.HotStreak].up and
-		(cooldown[FR.FireBlast].remains < 1.5 or cooldown[FR.FireBlast].charges >= 1)
-	then
-		return FR.Scorch;
-	end
-
-	-- fire_blast,use_while_casting=1,use_off_gcd=1,if=buff.blaster_master.stack>1&(prev_gcd.1.scorch&!buff.hot_streak.up&!action.scorch.executing|buff.blaster_master.remains<0.15);
-	if cooldown[FR.FireBlast].ready and (
-		buff[FR.BlasterMasterAura].count > 1 and
-			(
-				currentSpell == FR.Scorch and
-					not buff[FR.HotStreak].up or
-					buff[FR.BlasterMasterAura].remains < 0.3
-			)
-	) then
-		return FR.FireBlast;
-	end
-
-	-- living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1;
-	if talents[FR.LivingBomb] and cooldown[FR.LivingBomb].ready and buff[FR.Combustion].remains < gcd and targets > 1 then
-		return FR.LivingBomb;
-	end
-
-	-- dragons_breath,if=buff.combustion.remains<gcd.max;
-	if cooldown[FR.DragonsBreath].ready and buff[FR.Combustion].remains < gcd then
-		return FR.DragonsBreath;
-	end
-
-	-- scorch;
-	return FR.Scorch;
-end
-
 function Mage:FireCombustionPhase()
 	local fd = MaxDps.FrameData;
 	local cooldown = fd.cooldown;
@@ -314,11 +208,7 @@ function Mage:FireCombustionPhase()
 	local targetHp = fd.targetHp;
 	local gcd = fd.gcd;
 
-	-- call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled;
-	if azerite[A.BlasterMaster] > 0 and talents[FR.FlameOn] then
-		local result = Mage:FireBmCombustionPhase();
-		if result then return result; end
-	end
+	print('Combustion Phase')
 
 	-- call_action_list,name=active_talents;
 	local result = Mage:FireActiveTalents();
@@ -399,11 +289,7 @@ function Mage:FireRopPhase()
 	local targetHp = fd.targetHp;
 	local firestarterActive = fd.firestarterActive;
 
-	-- rune_of_power;
-	--if talents[FR.RuneOfPower] and cooldown[FR.RuneOfPower].ready and currentSpell ~= FR.RuneOfPower then
-	--	return FR.RuneOfPower;
-	--end
-
+	print('Rop Phase')
 	-- flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>4)&buff.hot_streak.react;
 	if currentSpell ~= FR.Flamestrike and
 		((talents[FR.FlamePatch] and targets > 1) or targets > 4) and
@@ -523,6 +409,7 @@ function Mage:FireStandardRotation()
 
 	local playerMoving = GetUnitSpeed('player') > 0;
 
+	print('Std Phase')
 	-- flamestrike,if=((talent.flame_patch.enabled&active_enemies>1&!firestarter.active)|active_enemies>4)&buff.hot_streak.react;
 	if currentSpell ~= FR.Flamestrike and
 		((talents[FR.FlamePatch] and targets > 1 and not firestarterActive) or targets > 4) and
