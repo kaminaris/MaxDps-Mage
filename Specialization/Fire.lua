@@ -79,7 +79,7 @@ function Mage:Fire()
 	local spellHistory = fd.spellHistory;
 	local targetHp = MaxDps:TargetPercentHealth() * 100;
 	local targets = MaxDps:SmartAoe();
-	local combustionRopCutoff = 60;
+	local combustionRopCutoff = 15;
 	local firestarterActive = talents[FR.Firestarter] and targetHp > 90;
     local health = UnitHealth('player')
 	local healthMax = UnitHealthMax('player');
