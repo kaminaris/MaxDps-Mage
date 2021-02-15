@@ -1,5 +1,5 @@
 ## Title: MaxDps_Mage
-## Version: 9.0.1
+## Version: 9.0.2
 ## Author: Kaminaris
 ## Interface: 90002
 ## Dependencies: MaxDps
