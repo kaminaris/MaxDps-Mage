@@ -44,7 +44,7 @@ local CN = {
 	Necrolord = 4
 };
 
--- Covenant abilities	
+-- Covenant abilities
 local C = {
 	-- Buttons
 	ClassAbility = 313347,
@@ -79,7 +79,7 @@ function Mage:Fire()
 	local spellHistory = fd.spellHistory;
 	local targetHp = MaxDps:TargetPercentHealth() * 100;
 	local targets = MaxDps:SmartAoe();
-	local combustionRopCutoff = 60;
+	local combustionRopCutoff = 15;
 	local firestarterActive = talents[FR.Firestarter] and targetHp > 90;
     local health = UnitHealth('player')
 	local healthMax = UnitHealthMax('player');
@@ -93,39 +93,39 @@ function Mage:Fire()
 
 	-- If NightFae covenant, use ShiftingPower as a cooldown
 	MaxDps:GlowCooldown(
-		C.ShiftingPower, 
-		covenant == CN.NightFae and 
+		C.ShiftingPower,
+		covenant == CN.NightFae and
 			cooldown[C.ShiftingPower].ready and
-				not buff[FR.HeatingUp].up and 
+				not buff[FR.HeatingUp].up and
 					not buff[FR.HotStreak].up and
-						not buff[FR.Combustion].up and 
+						not buff[FR.Combustion].up and
 							not buff[FR.RuneOfPowerAura].up
 	);
 	MaxDps:GlowCooldown(
-		C.Deathborne, 
-		covenant == CN.Necrolord and 
+		C.Deathborne,
+		covenant == CN.Necrolord and
 			cooldown[C.Deathborne].ready and
-				not buff[FR.HeatingUp].up and 
+				not buff[FR.HeatingUp].up and
 					not buff[FR.HotStreak].up and
-						not buff[FR.Combustion].up and 
+						not buff[FR.Combustion].up and
 							not buff[FR.RuneOfPowerAura].up
 	);
 	MaxDps:GlowCooldown(
-		C.RadiantSpark, 
-		covenant == CN.Kyrian and 
+		C.RadiantSpark,
+		covenant == CN.Kyrian and
 			cooldown[C.RadiantSpark].ready and
-				not buff[FR.HeatingUp].up and 
+				not buff[FR.HeatingUp].up and
 					not buff[FR.HotStreak].up and
-						not buff[FR.Combustion].up and 
+						not buff[FR.Combustion].up and
 							not buff[FR.RuneOfPowerAura].up
 	);
 	MaxDps:GlowCooldown(
-		C.MirrorsOfTorment, 
-		covenant == CN.Venthyr and 
+		C.MirrorsOfTorment,
+		covenant == CN.Venthyr and
 			cooldown[C.MirrorsOfTorment].ready and
-				not buff[FR.HeatingUp].up and 
+				not buff[FR.HeatingUp].up and
 					not buff[FR.HotStreak].up and
-						not buff[FR.Combustion].up and 
+						not buff[FR.Combustion].up and
 							not buff[FR.RuneOfPowerAura].up
 	);
 	-- mirror_image,if=buff.combustion.down; isnt a dps CD so only use on lower then 50% life
