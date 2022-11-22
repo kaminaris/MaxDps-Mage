@@ -5,7 +5,7 @@ _G[addonName] = addonTable;
 if not MaxDps then return end
 
 local MaxDps = MaxDps;
-local Mage = MaxDps:NewModule('Mage', 'AceEvent-3.0');
+local Mage = MaxDps:NewModule('Mage');
 addonTable.Mage = Mage;
 
 Mage.spellMeta = {
@@ -24,13 +24,7 @@ function Mage:Enable()
 	elseif MaxDps.Spec == 3 then
 		MaxDps:Print(MaxDps.Colors.Info .. 'Mage Frost');
 		MaxDps.NextSpell = Mage.Frost;
-		Mage:RegisterEvent('UNIT_SPELLCAST_SUCCEEDED');
 	end
 
 	return true;
 end
-
-function Mage:Disable()
-	self:UnregisterAllEvents();
-end
-
