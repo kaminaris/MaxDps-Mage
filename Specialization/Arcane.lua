@@ -52,6 +52,7 @@ local AR = {
 	NetherTempest = 114923,
 	ArcaneMissiles = 5143,
 	ArcaneHarmony = 384452,
+	ArcaneHarmonyBuff = 384455,
 	ArcaneBarrage = 44425,
 	ArcaneEcho = 342231,
 	PresenceOfMind = 205025,
@@ -149,7 +150,7 @@ function Mage:BurnPhase()
 	if Mage:SpellReady(AR.Evocation) then
 		return AR.Evocation;
 	end
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmony].count < 20 then
+	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
 		return AR.ArcaneMissiles;
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
@@ -201,7 +202,7 @@ end
 
 function Mage:MiniBurnPhase()
 
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmony].count < 20 then
+	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
 		return AR.ArcaneMissiles;
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
@@ -276,7 +277,7 @@ function Mage:BurnPhaseMulti()
 	if Mage:SpellReady(AR.Evocation) then
 		return AR.Evocation;
 	end
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmony].count < 20 then
+	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
 		return AR.ArcaneMissiles;
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
@@ -328,7 +329,7 @@ end
 
 function Mage:MiniBurnPhaseMulti()
 
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmony].count < 20 then
+	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
 		return AR.ArcaneMissiles;
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
