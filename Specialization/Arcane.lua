@@ -1,31 +1,30 @@
-local _, addonTable = ...;
+local _, addonTable = ...
 
 --- @type MaxDps
 if not MaxDps then return end
 -- Build string = B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaBSLJAAAAAAAAAAAAJJJJhkkkcAA
 
-local Mage = addonTable.Mage;
-local MaxDps = MaxDps;
-local UnitPower = UnitPower;
-local UnitPowerMax = UnitPowerMax;
-local fd;
-local spellHistory;
-local cooldown;
-local buff;
-local debuff;
-local spellHistory;
-local talents;
-local targets;
-local gcd;
-local aoeTargetCount;
-local mana;
-local maxMana;
-local manaPct;
-local targetHp;
-local chargeCount;
-local spellHaste;
-local conserveMana;
-local phase;
+local Mage = addonTable.Mage
+local MaxDps = MaxDps
+local UnitPower = UnitPower
+local UnitPowerMax = UnitPowerMax
+local fd
+local spellHistory
+local cooldown
+local buff
+local debuff
+local talents
+local targets
+local gcd
+local aoeTargetCount
+local mana
+local maxMana
+local manaPct
+local targetHp
+local chargeCount
+local spellHaste
+local conserveMana
+local phase
 
 local AR = {
 	ArcaneIntellect = 1459,
@@ -61,13 +60,13 @@ local AR = {
 	Concentration = 384374,
 	NetherPrecision = 383782,
 	ArcaneExplosion = 1449
-};
+}
 local A = {
-};
+}
 
 function Mage:SpellReady(spellId)
-	spellKnown = IsSpellKnownOrOverridesKnown(spellId);
-	cooldownReady = cooldown[spellId].ready;
+	local spellKnown = IsSpellKnownOrOverridesKnown(spellId)
+	local cooldownReady = cooldown[spellId].ready
 
 	if spellKnown and cooldownReady then
 		return true
@@ -77,53 +76,53 @@ function Mage:SpellReady(spellId)
 end
 
 function Mage:Arcane()
-	fd = MaxDps.FrameData;
-	spellHistory = fd.spellHistory;
-	cooldown = fd.cooldown;
-	buff = fd.buff;
-	debuff = fd.debuff;
-	spellHistory = fd.spellHistory;
-	talents = fd.talents;
-	targets = MaxDps:SmartAoe();
-	gcd = fd.gcd;
-	aoeTargetCount = 2;
+	fd = MaxDps.FrameData
+	spellHistory = fd.spellHistory
+	cooldown = fd.cooldown
+	buff = fd.buff
+	debuff = fd.debuff
+	spellHistory = fd.spellHistory
+	talents = fd.talents
+	targets = MaxDps:SmartAoe()
+	gcd = fd.gcd
+	aoeTargetCount = 2
 	chargeCount = UnitPower('player', Enum.PowerType.ArcaneCharges)
 	mana = UnitPower('player', Enum.PowerType.Mana)
-	maxMana = UnitPowerMax('player', Enum.PowerType.Mana);
-	manaPct = mana / maxMana;
-	targetHp = MaxDps:TargetPercentHealth();
+	maxMana = UnitPowerMax('player', Enum.PowerType.Mana)
+	manaPct = mana / maxMana
+	targetHp = MaxDps:TargetPercentHealth()
 	spellHaste = MaxDps:AttackHaste()
-	conserveMana = 0;
+	conserveMana = 0
 
 	if phase == nil then
-		phase = 0;
+		phase = 0
 	end
 
 	if Mage:SpellReady(AR.TimeWarp) then
-		MaxDps:GlowCooldown(AR.TimeWarp, true);
+		MaxDps:GlowCooldown(AR.TimeWarp, true)
 	end
 
 	if Mage:SpellReady(AR.TemporalWarp) then
-		MaxDps:GlowCooldown(AR.TemporalWarp, true);
+		MaxDps:GlowCooldown(AR.TemporalWarp, true)
 	end
 
 	if not Mage:SpellReady(AR.TouchOfTheMagi) and not debuff[AR.TouchOfTheMagi].up then
-		phase = 0;
+		phase = 0
 	end
 
 	if phase > 0 or (Mage:SpellReady(AR.TouchOfTheMagi) and Mage:SpellReady(AR.RuneOfPower) and Mage:SpellReady(AR.RadiantSpark)  and (chargeCount == 4 or (chargeCount >= 2 and Mage:SpellReady(AR.ArcaneOrb)))) then
 		if phase == 1 or ( Mage:SpellReady(AR.Evocation) and Mage:SpellReady(AR.ArcaneSurge) )then
-			phase = 1;
+			phase = 1
 			if targets >= 3 then
 				-- print("burn phase multi")
-				return Mage:BurnPhaseMulti();
+				return Mage:BurnPhaseMulti()
 			else
 				-- print("burn phase")
-				return Mage:BurnPhase();
+				return Mage:BurnPhase()
 			end
 
 		else
-			phase = 2;
+			phase = 2
 			if targets >= 3 then
 				-- print("mini burn phase multi")
 				return Mage:MiniBurnPhaseMulti()
@@ -148,254 +147,254 @@ end
 
 function Mage:BurnPhase()
 	if Mage:SpellReady(AR.Evocation) then
-		return AR.Evocation;
+		return AR.Evocation
 	end
 	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower;
+		return AR.RuneOfPower
 	end
 	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark;
+		return AR.RadiantSpark
 	end
 	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneSurge) then
-		return AR.ArcaneSurge;
+		return AR.ArcaneSurge
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi;
+		return AR.TouchOfTheMagi
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem;
+		return AR.UseManaGem
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	--if Mage:SpellReady(AR.ArcaneBarrage) then -- as last global
-	--	return AR.ArcaneBarrage;
+	--	return AR.ArcaneBarrage
 	--end
 end
 
 function Mage:MiniBurnPhase()
 
 	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower;
+		return AR.RuneOfPower
 	end
 	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark;
+		return AR.RadiantSpark
 	end
 	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi;
+		return AR.TouchOfTheMagi
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem;
+		return AR.UseManaGem
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 end
 
 function Mage:ConservePhase()
 	if Mage:SpellReady(AR.ArcaneOrb) and chargeCount < 4 then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.ShiftingPower) then
-		return AR.ShiftingPower;
+		return AR.ShiftingPower
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 2 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 0 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable and chargeCount == 4 then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and chargeCount == 4 and manaPct < 60 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 end
 
 function Mage:BurnPhaseMulti()
 	if Mage:SpellReady(AR.Evocation) then
-		return AR.Evocation;
+		return AR.Evocation
 	end
 	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower;
+		return AR.RuneOfPower
 	end
 	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark;
+		return AR.RadiantSpark
 	end
 	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.ArcaneSurge) then
-		return AR.ArcaneSurge;
+		return AR.ArcaneSurge
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi;
+		return AR.TouchOfTheMagi
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem;
+		return AR.UseManaGem
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	--if Mage:SpellReady(AR.ArcaneBarrage) then -- as last global
-	--	return AR.ArcaneBarrage;
+	--	return AR.ArcaneBarrage
 	--end
 end
 
 function Mage:MiniBurnPhaseMulti()
 
 	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles;
+		return AR.ArcaneMissiles
 	end
 	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower;
+		return AR.RuneOfPower
 	end
 	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark;
+		return AR.RadiantSpark
 	end
 	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi;
+		return AR.TouchOfTheMagi
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem;
+		return AR.UseManaGem
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 end
 
 function Mage:ConservePhaseMulti()
 	if Mage:SpellReady(AR.ArcaneOrb) and chargeCount < 4 then
-		return AR.ArcaneOrb;
+		return AR.ArcaneOrb
 	end
 	if Mage:SpellReady(AR.ShiftingPower) then
-		return AR.ShiftingPower;
+		return AR.ShiftingPower
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 2 then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast;
+		return AR.ArcaneBlast
 	end
 	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 0 then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable and chargeCount == 4 then
-		return AR.NetherTempest;
+		return AR.NetherTempest
 	end
 	if Mage:SpellReady(AR.ArcaneBarrage) and chargeCount == 4 and manaPct < 60 then
-		return AR.ArcaneBarrage;
+		return AR.ArcaneBarrage
 	end
 	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion;
+		return AR.ArcaneExplosion
 	end
 end
