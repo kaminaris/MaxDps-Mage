@@ -6,6 +6,7 @@
 ## LoadOnDemand: 1
 ## X-Curse-Project-ID: 99327
 ## X-WoWI-ID: 24643
+## X-Wago-ID: nKW1bLNE
 
 Main.lua
 Specialization/Arcane.lua
