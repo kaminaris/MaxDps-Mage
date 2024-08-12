@@ -1,400 +1,352 @@
 local _, addonTable = ...
-
---- @type MaxDps
-if not MaxDps then return end
--- Build string = B4DAAAAAAAAAAAAAAAAAAAAAAIJQolIhkUAJtEiIikIhEaBSLJAAAAAAAAAAAAJJJJhkkkcAA
-
 local Mage = addonTable.Mage
-local MaxDps = MaxDps
+local MaxDps = _G.MaxDps
+if not MaxDps then return end
+
 local UnitPower = UnitPower
+local UnitHealth = UnitHealth
+local UnitAura = C_UnitAuras.GetAuraDataByIndex
+local UnitAuraByName = C_UnitAuras.GetAuraDataBySpellName
+local UnitHealthMax = UnitHealthMax
 local UnitPowerMax = UnitPowerMax
+local SpellHaste
+local SpellCrit
+local GetSpellInfo = C_Spell.GetSpellInfo
+local GetSpellCooldown = C_Spell.GetSpellCooldown
+local GetSpellCount = C_Spell.GetSpellCastCount
+
+local ManaPT = Enum.PowerType.Mana
+local RagePT = Enum.PowerType.Rage
+local FocusPT = Enum.PowerType.Focus
+local EnergyPT = Enum.PowerType.Energy
+local ComboPointsPT = Enum.PowerType.ComboPoints
+local RunesPT = Enum.PowerType.Runes
+local RunicPowerPT = Enum.PowerType.RunicPower
+local SoulShardsPT = Enum.PowerType.SoulShards
+local LunarPowerPT = Enum.PowerType.LunarPower
+local HolyPowerPT = Enum.PowerType.HolyPower
+local MaelstromPT = Enum.PowerType.Maelstrom
+local ChiPT = Enum.PowerType.Chi
+local InsanityPT = Enum.PowerType.Insanity
+local ArcaneChargesPT = Enum.PowerType.ArcaneCharges
+local FuryPT = Enum.PowerType.Fury
+local PainPT = Enum.PowerType.Pain
+local EssencePT = Enum.PowerType.Essence
+local RuneBloodPT = Enum.PowerType.RuneBlood
+local RuneFrostPT = Enum.PowerType.RuneFrost
+local RuneUnholyPT = Enum.PowerType.RuneUnholy
+
 local fd
-local spellHistory
+local ttd
+local timeShift
+local gcd
 local cooldown
 local buff
 local debuff
 local talents
 local targets
-local gcd
-local aoeTargetCount
-local mana
-local maxMana
-local manaPct
-local targetHp
-local chargeCount
-local spellHaste
-local conserveMana
-local phase
+local targetHP
+local targetmaxHP
+local targethealthPerc
+local curentHP
+local maxHP
+local healthPerc
+local timeInCombat
+local className, classFilename, classId = UnitClass('player')
+local currentSpec = GetSpecialization()
+local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or 'None'
+local classtable
+local LibRangeCheck = LibStub('LibRangeCheck-3.0', true)
 
-local AR = {
-	ArcaneIntellect = 1459,
-	ArcaneFamiliar = 205022,
-	ConjureManaGem = 759,
-	MirrorImage = 55342,
-	ArcaneBlast = 30451,
-	SiphonStorm = 384187,
-	Evocation = 12051,
-	TimeWarp = 80353,
-	TemporalWarp = 386539,
-	ArcaneSurge = 365350,
-	ArcaneOrb = 153626,
-	ArcaneCharge = 36032,
-	RuneOfPower = 116011,
-	RadiantSpark = 376103,
-	RadiantSparkStacks = 376104,
-	TouchOfTheMagi = 321507,
-	CascadingPower = 384276,
-	ClearcastingOld = 79684,
-	Clearcasting = 263725,
-	ShiftingPower = 382440,
-	IceNova = 157997,
-	NetherTempest = 114923,
-	ArcaneMissiles = 5143,
-	ArcaneHarmony = 384452,
-	ArcaneHarmonyBuff = 384455,
-	ArcaneBarrage = 44425,
-	ArcaneEcho = 342231,
-	PresenceOfMind = 205025,
-	Meteor = 153561,
-	ArcaneBombardment = 384581,
-	Concentration = 384374,
-	NetherPrecision = 383782,
-	ArcaneExplosion = 1449
-}
-local A = {
-}
+local ArcaneCharges
+local Mana
+local ManaMax
+local ManaDeficit
+local ManaPerc
 
-function Mage:SpellReady(spellId)
-	local spellKnown = IsSpellKnownOrOverridesKnown(spellId)
-	local cooldownReady = cooldown[spellId].ready
+local Arcane = {}
 
-	if spellKnown and cooldownReady then
-		return true
-	end
+local aoe_target_count
+local opener
+local alt_rotation
+local steroid_trinket_equipped
 
-	return false
+local function CheckSpellCosts(spell,spellstring)
+    if not IsSpellKnownOrOverridesKnown(spell) then return false end
+    if not C_Spell.IsSpellUsable(spell) then return false end
+    if spellstring == 'TouchofDeath' then
+        if targethealthPerc > 15 then
+            return false
+        end
+    end
+    if spellstring == 'KillShot' then
+        if (classtable.SicEmBuff and not buff[classtable.SicEmBuff].up) or (classtable.HuntersPreyBuff and not buff[classtable.HuntersPreyBuff].up) and targethealthPerc > 15 then
+            return false
+        end
+    end
+    if spellstring == 'HammerofWrath' then
+        if ( (classtable.AvengingWrathBuff and not buff[classtable.AvengingWrathBuff].up) or (classtable.FinalVerdictBuff and not buff[classtable.FinalVerdictBuff].up) ) and targethealthPerc > 20 then
+            return false
+        end
+    end
+    if spellstring == 'Execute' then
+        if (classtable.SuddenDeathBuff and not buff[classtable.SuddenDeathBuff].up) and targethealthPerc > 35 then
+            return false
+        end
+    end
+    local costs = C_Spell.GetSpellPowerCost(spell)
+    if type(costs) ~= 'table' and spellstring then return true end
+    for i,costtable in pairs(costs) do
+        if UnitPower('player', costtable.type) < costtable.cost then
+            return false
+        end
+    end
+    return true
+end
+local function MaxGetSpellCost(spell,power)
+    local costs = C_Spell.GetSpellPowerCost(spell)
+    if type(costs) ~= 'table' then return 0 end
+    for i,costtable in pairs(costs) do
+        if costtable.name == power then
+            return costtable.cost
+        end
+    end
+    return 0
 end
 
+
+
+local function CheckEquipped(checkName)
+    for i=1,14 do
+        local itemID = GetInventoryItemID('player', i)
+        local itemName = itemID and C_Item.GetItemInfo(itemID) or ''
+        if checkName == itemName then
+            return true
+        end
+    end
+    return false
+end
+
+
+
+
+local function freezable()
+   if (cooldown[classtable.IceNova].ready or cooldown[classtable.Freeze].ready or cooldown[classtable.FrostNova].ready) and not ( UnitName('target') == UnitName('boss1') or UnitName('target') == UnitName('boss2') or UnitName('target') == UnitName('boss3') or UnitName('target') == UnitName('boss4') or UnitName('target') == UnitName('boss5') or UnitName('target') == UnitName('boss6') or UnitName('target') == UnitName('boss7') or UnitName('target') == UnitName('boss8') ) then
+      return true
+    else
+      return false
+   end
+end
+
+
+local function CheckPrevSpell(spell)
+    if MaxDps and MaxDps.spellHistory then
+        if MaxDps.spellHistory[1] then
+            if MaxDps.spellHistory[1] == spell then
+                return true
+            end
+            if MaxDps.spellHistory[1] ~= spell then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+
+local function boss()
+    if UnitExists('boss1')
+    or UnitExists('boss2')
+    or UnitExists('boss3')
+    or UnitExists('boss4')
+    or UnitExists('boss5')
+    or UnitExists('boss6')
+    or UnitExists('boss7')
+    or UnitExists('boss8')
+    or UnitExists('boss9')
+    or UnitExists('boss10') then
+        return true
+    end
+    return false
+end
+
+
+function Arcane:precombat()
+    --if (MaxDps:FindSpell(classtable.ArcaneIntellect) and CheckSpellCosts(classtable.ArcaneIntellect, 'ArcaneIntellect')) and cooldown[classtable.ArcaneIntellect].ready then
+    --    return classtable.ArcaneIntellect
+    --end
+    aoe_target_count = 2
+    if not talents[classtable.ArcingCleave] then
+        aoe_target_count = 9
+    end
+    --opener = true
+    if talents[classtable.HighVoltage] then
+        alt_rotation = true
+    else
+        alt_rotation = false
+    end
+    --if (MaxDps:FindSpell(classtable.MirrorImage) and CheckSpellCosts(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
+    --    return classtable.MirrorImage
+    --end
+    --if (MaxDps:FindSpell(classtable.ArcaneBlast) and CheckSpellCosts(classtable.ArcaneBlast, 'ArcaneBlast')) and (not talents[classtable.Evocation]) and cooldown[classtable.ArcaneBlast].ready then
+    --    return classtable.ArcaneBlast
+    --end
+    --if (MaxDps:FindSpell(classtable.Evocation) and CheckSpellCosts(classtable.Evocation, 'Evocation')) and (talents[classtable.Evocation]) and cooldown[classtable.Evocation].ready then
+    --    return classtable.Evocation
+    --end
+end
+function Arcane:cd_opener()
+    if (MaxDps:FindSpell(classtable.TouchoftheMagi) and CheckSpellCosts(classtable.TouchoftheMagi, 'TouchoftheMagi')) and ((MaxDps.spellHistory[1] == classtable.ArcaneBarrage) and ( (cooldown[classtable.ArcaneBarrage].duration >0 and cooldown[classtable.ArcaneBarrage].duration /100 or 0) <= 0.5 or gcd <= 0.5 )) and cooldown[classtable.TouchoftheMagi].ready then
+        return classtable.TouchoftheMagi
+    end
+    if (MaxDps:FindSpell(classtable.Supernova) and CheckSpellCosts(classtable.Supernova, 'Supernova')) and (debuff[classtable.TouchoftheMagiDeBuff].remains <= gcd and buff[classtable.UnerringProficiencyBuff].count == 30) and cooldown[classtable.Supernova].ready then
+        return classtable.Supernova
+    end
+    if (MaxDps:FindSpell(classtable.PresenceofMind) and CheckSpellCosts(classtable.PresenceofMind, 'PresenceofMind')) and (debuff[classtable.TouchoftheMagiDeBuff].remains <= gcd and buff[classtable.NetherPrecisionBuff].up and targets <aoe_target_count and not talents[classtable.UnerringProficiency]) and cooldown[classtable.PresenceofMind].ready then
+        return classtable.PresenceofMind
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBlast) and CheckSpellCosts(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.PresenceofMindBuff].up) and cooldown[classtable.ArcaneBlast].ready then
+        return classtable.ArcaneBlast
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneOrb) and CheckSpellCosts(classtable.ArcaneOrb, 'ArcaneOrb')) and (opener) and cooldown[classtable.ArcaneOrb].ready then
+        return classtable.ArcaneOrb
+    end
+    if (MaxDps:FindSpell(classtable.Evocation) and CheckSpellCosts(classtable.Evocation, 'Evocation')) and (cooldown[classtable.ArcaneSurge].remains <gcd * 2) and cooldown[classtable.Evocation].ready then
+        return classtable.Evocation
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneMissiles) and CheckSpellCosts(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (opener) and cooldown[classtable.ArcaneMissiles].ready then
+        return classtable.ArcaneMissiles
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneSurge) and CheckSpellCosts(classtable.ArcaneSurge, 'ArcaneSurge')) and cooldown[classtable.ArcaneSurge].ready then
+        return classtable.ArcaneSurge
+    end
+    if (MaxDps:FindSpell(classtable.ShiftingPower) and CheckSpellCosts(classtable.ShiftingPower, 'ShiftingPower')) and (( ( not buff[classtable.ArcaneSurgeBuff].up and not buff[classtable.SiphonStormBuff].up and not debuff[classtable.TouchoftheMagiDeBuff].up and cooldown[classtable.Evocation].remains >15 and cooldown[classtable.TouchoftheMagi].remains >15 ) and ( cooldown[classtable.ArcaneOrb].ready==false and cooldown[classtable.ArcaneOrb].charges == 0 ) and ttd >10 ) or ( (MaxDps.spellHistory[1] == classtable.ArcaneBarrage) and ( buff[classtable.ArcaneSurgeBuff].up or debuff[classtable.TouchoftheMagiDeBuff].up or cooldown[classtable.Evocation].remains <20 ) and talents[classtable.ShiftingShards] )) and cooldown[classtable.ShiftingPower].ready then
+        return classtable.ShiftingPower
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneOrb) and CheckSpellCosts(classtable.ArcaneOrb, 'ArcaneOrb')) and (ArcaneCharges <2 and ( cooldown[classtable.TouchoftheMagi].remains >18 or not (targets >= aoe_target_count) )) and cooldown[classtable.ArcaneOrb].ready then
+        return classtable.ArcaneOrb
+    end
+end
+function Arcane:rotation_aoe()
+    if (MaxDps:FindSpell(classtable.ArcaneBlast) and CheckSpellCosts(classtable.ArcaneBlast, 'ArcaneBlast')) and (targets >= aoe_target_count and debuff[classtable.TouchoftheMagiDeBuff].up and talents[classtable.MagisSpark]) and cooldown[classtable.ArcaneBlast].ready then
+        return classtable.ArcaneBlast
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (( talents[classtable.ArcaneTempo] and buff[classtable.ArcaneTempoBuff].remains <gcd ) or ( ( buff[classtable.IntuitionBuff].up and ( ArcaneCharges == 4 or not alt_rotation ) ) and buff[classtable.NetherPrecisionBuff].up ) or ( buff[classtable.NetherPrecisionBuff].up )) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneMissiles) and CheckSpellCosts(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.ClearcastingBuff].up and ( ( alt_rotation and ArcaneCharges <4 ) or buff[classtable.AetherAttunementBuff].up or talents[classtable.ArcaneHarmony] ) and ( ( alt_rotation and ArcaneCharges <4 ) or not buff[classtable.NetherPrecisionBuff].up )) and cooldown[classtable.ArcaneMissiles].ready then
+        return classtable.ArcaneMissiles
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (ArcaneCharges == 4) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneExplosion) and CheckSpellCosts(classtable.ArcaneExplosion, 'ArcaneExplosion')) and cooldown[classtable.ArcaneExplosion].ready then
+        return classtable.ArcaneExplosion
+    end
+end
+function Arcane:rotation_default()
+    if (MaxDps:FindSpell(classtable.ArcaneMissiles) and CheckSpellCosts(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.ClearcastingBuff].up and ( not buff[classtable.NetherPrecisionBuff].up or ( buff[classtable.ClearcastingBuff].count == 3 and not talents[classtable.SplinteringSorcery] ) or ( alt_rotation and buff[classtable.NetherPrecisionBuff].count == 1 and ArcaneCharges <4 ) )) and cooldown[classtable.ArcaneMissiles].ready then
+        return classtable.ArcaneMissiles
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (( ArcaneCharges == 4 and ( ( buff[classtable.NetherPrecisionBuff].count == 1 and ( ( buff[classtable.ClearcastingBuff].up or cooldown[classtable.ArcaneOrb].charges >0 ) ) and buff[classtable.ArcaneHarmonyBuff].count >12 ) or ( cooldown[classtable.TouchoftheMagi].ready and ( buff[classtable.NetherPrecisionBuff].up or not talents[classtable.MagisSpark] ) ) ) ) or ( talents[classtable.ArcaneTempo] and buff[classtable.ArcaneTempoBuff].remains <( gcd * 2 ) ) or buff[classtable.IntuitionBuff].up) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBlast) and CheckSpellCosts(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.NetherPrecisionBuff].count == 2 or ( buff[classtable.NetherPrecisionBuff].count == 1 and not (MaxDps.spellHistory[1] == classtable.ArcaneBlast) )) and cooldown[classtable.ArcaneBlast].ready then
+        return classtable.ArcaneBlast
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (not buff[classtable.ArcaneSurgeBuff].up and ( ManaPerc <70 and cooldown[classtable.ArcaneSurge].remains >45 and cooldown[classtable.TouchoftheMagi].remains >6 ) or ( ManaDeficit >( ManaMax - MaxGetSpellCost(classtable.ArcaneBlast, 'MANA') ) ) or cooldown[classtable.TouchoftheMagi].ready or ( cooldown[classtable.ShiftingPower].ready and cooldown[classtable.ArcaneOrb].ready )) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBlast) and CheckSpellCosts(classtable.ArcaneBlast, 'ArcaneBlast')) and (not talents[classtable.SplinteringSorcery] or ( ArcaneCharges >2 and not buff[classtable.NetherPrecisionBuff].up )) and cooldown[classtable.ArcaneBlast].ready then
+        return classtable.ArcaneBlast
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+end
+
+function Arcane:callaction()
+    if (MaxDps:FindSpell(classtable.Counterspell) and CheckSpellCosts(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
+        MaxDps:GlowCooldown(classtable.Counterspell, select(8,UnitCastingInfo('target') == false) and cooldown[classtable.Counterspell].ready)
+    end
+    if debuff[classtable.TouchoftheMagiDeBuff].up and opener then
+        opener = false
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (ttd <2) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+    local cd_openerCheck = Arcane:cd_opener()
+    if cd_openerCheck then
+        return cd_openerCheck
+    end
+    if (targets >= ( aoe_target_count + (talents[classtable.Impetus] and talents[classtable.Impetus] or 0) + (talents[classtable.SplinteringSorcery] and talents[classtable.SplinteringSorcery] or 0) )) then
+        local rotation_aoeCheck = Arcane:rotation_aoe()
+        if rotation_aoeCheck then
+            return Arcane:rotation_aoe()
+        end
+    end
+    local rotation_defaultCheck = Arcane:rotation_default()
+    if rotation_defaultCheck then
+        return rotation_defaultCheck
+    end
+    if (MaxDps:FindSpell(classtable.ArcaneBarrage) and CheckSpellCosts(classtable.ArcaneBarrage, 'ArcaneBarrage')) and cooldown[classtable.ArcaneBarrage].ready then
+        return classtable.ArcaneBarrage
+    end
+end
 function Mage:Arcane()
-	fd = MaxDps.FrameData
-	spellHistory = fd.spellHistory
-	cooldown = fd.cooldown
-	buff = fd.buff
-	debuff = fd.debuff
-	spellHistory = fd.spellHistory
-	talents = fd.talents
-	targets = MaxDps:SmartAoe()
-	gcd = fd.gcd
-	aoeTargetCount = 2
-	chargeCount = UnitPower('player', Enum.PowerType.ArcaneCharges)
-	mana = UnitPower('player', Enum.PowerType.Mana)
-	maxMana = UnitPowerMax('player', Enum.PowerType.Mana)
-	manaPct = mana / maxMana
-	targetHp = MaxDps:TargetPercentHealth()
-	spellHaste = MaxDps:AttackHaste()
-	conserveMana = 0
-
-	if phase == nil then
-		phase = 0
-	end
-
-	if Mage:SpellReady(AR.TimeWarp) then
-		MaxDps:GlowCooldown(AR.TimeWarp, true)
-	end
-
-	if Mage:SpellReady(AR.TemporalWarp) then
-		MaxDps:GlowCooldown(AR.TemporalWarp, true)
-	end
-
-	if not Mage:SpellReady(AR.TouchOfTheMagi) and not debuff[AR.TouchOfTheMagi].up then
-		phase = 0
-	end
-
-	if phase > 0 or (Mage:SpellReady(AR.TouchOfTheMagi) and Mage:SpellReady(AR.RuneOfPower) and Mage:SpellReady(AR.RadiantSpark)  and (chargeCount == 4 or (chargeCount >= 2 and Mage:SpellReady(AR.ArcaneOrb)))) then
-		if phase == 1 or ( Mage:SpellReady(AR.Evocation) and Mage:SpellReady(AR.ArcaneSurge) )then
-			phase = 1
-			if targets >= 3 then
-				-- print("burn phase multi")
-				return Mage:BurnPhaseMulti()
-			else
-				-- print("burn phase")
-				return Mage:BurnPhase()
-			end
-
-		else
-			phase = 2
-			if targets >= 3 then
-				-- print("mini burn phase multi")
-				return Mage:MiniBurnPhaseMulti()
-			else
-				-- print("mini burn phase")
-				return Mage:MiniBurnPhase()
-			end
-
-		end
-	end
-
-	if targets >= 3 then
-		-- print("conserve phase multi")
-		return Mage:ConservePhaseMulti()
+    fd = MaxDps.FrameData
+    ttd = (fd.timeToDie and fd.timeToDie) or 500
+    timeShift = fd.timeShift
+    gcd = fd.gcd
+    cooldown = fd.cooldown
+    buff = fd.buff
+    debuff = fd.debuff
+    talents = fd.talents
+    targets = MaxDps:SmartAoe()
+    Mana = UnitPower('player', ManaPT)
+    ManaMax = UnitPowerMax('player', ManaPT)
+    ManaDeficit = ManaMax - Mana
+    targetHP = UnitHealth('target')
+    targetmaxHP = UnitHealthMax('target')
+    targethealthPerc = (targetHP / targetmaxHP) * 100
+    curentHP = UnitHealth('player')
+    maxHP = UnitHealthMax('player')
+    healthPerc = (curentHP / maxHP) * 100
+    timeInCombat = MaxDps.combatTime or 0
+    classtable = MaxDps.SpellTable
+    SpellHaste = UnitSpellHaste('player')
+    SpellCrit = GetCritChance()
+    ArcaneCharges = UnitPower('player', ArcaneChargesPT)
+    ManaPerc = (Mana / ManaMax) * 100
+    for spellId in pairs(MaxDps.Flags) do
+        self.Flags[spellId] = false
+        self:ClearGlowIndependent(spellId, spellId)
+    end
+    classtable.TouchoftheMagiDeBuff = 210824
+    classtable.UnerringProficiencyBuff = 0
+    classtable.NetherPrecisionBuff = 383783
+    classtable.PresenceofMindBuff = 205025
+    classtable.ArcaneSurgeBuff = 365362
+    classtable.SiphonStormBuff = 384267
+    classtable.ArcaneChargeBuff = 0
+    classtable.ArcaneTempoBuff = 383997
+    classtable.IntuitionBuff = 0
+    classtable.ClearcastingBuff = 263725
+    classtable.AetherAttunementBuff = 453601
+    classtable.ArcaneHarmonyBuff = 384455
+	if timeInCombat <= 4 then
+		opener = true
 	else
-		-- print("conserve phase")
-		return Mage:ConservePhase()
+		opener = false
 	end
 
+    local precombatCheck = Arcane:precombat()
+    if precombatCheck then
+        return Arcane:precombat()
+    end
 
-end
-
-function Mage:BurnPhase()
-	if Mage:SpellReady(AR.Evocation) then
-		return AR.Evocation
-	end
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower
-	end
-	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark
-	end
-	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneSurge) then
-		return AR.ArcaneSurge
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneMissiles
-	end
-	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast
-	end
-	--if Mage:SpellReady(AR.ArcaneBarrage) then -- as last global
-	--	return AR.ArcaneBarrage
-	--end
-end
-
-function Mage:MiniBurnPhase()
-
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower
-	end
-	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark
-	end
-	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneMissiles
-	end
-	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast
-	end
-end
-
-function Mage:ConservePhase()
-	if Mage:SpellReady(AR.ArcaneOrb) and chargeCount < 4 then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.ShiftingPower) then
-		return AR.ShiftingPower
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 2 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 0 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable and chargeCount == 4 then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and chargeCount == 4 and manaPct < 60 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneBlast
-	end
-end
-
-function Mage:BurnPhaseMulti()
-	if Mage:SpellReady(AR.Evocation) then
-		return AR.Evocation
-	end
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower
-	end
-	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark
-	end
-	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.ArcaneSurge) then
-		return AR.ArcaneSurge
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneExplosion
-	end
-	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion
-	end
-	--if Mage:SpellReady(AR.ArcaneBarrage) then -- as last global
-	--	return AR.ArcaneBarrage
-	--end
-end
-
-function Mage:MiniBurnPhaseMulti()
-
-	if talents[AR.ArcaneHarmony] and buff[AR.ArcaneHarmonyBuff].count < 20 then
-		return AR.ArcaneMissiles
-	end
-	if Mage:SpellReady(AR.ArcaneOrb) then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.RuneOfPower) then
-		return AR.RuneOfPower
-	end
-	if Mage:SpellReady(AR.RadiantSpark) then
-		return AR.RadiantSpark
-	end
-	if debuff[AR.RadiantSpark].up and debuff[AR.RadiantSparkStacks].count < 3 then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.TimeWarp].up then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and buff[AR.RadiantSpark].up then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.TouchOfTheMagi) then
-		return AR.TouchOfTheMagi
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].up then
-		return AR.ArcaneExplosion
-	end
-	if talents[AR.CascadingPower] and manaPct < 85 and cooldown[AR.UseManaGem].ready then
-		return AR.UseManaGem
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and targetHp < 35 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion
-	end
-end
-
-function Mage:ConservePhaseMulti()
-	if Mage:SpellReady(AR.ArcaneOrb) and chargeCount < 4 then
-		return AR.ArcaneOrb
-	end
-	if Mage:SpellReady(AR.ShiftingPower) then
-		return AR.ShiftingPower
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 2 then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) and buff[AR.NetherPrecision].up then
-		return AR.ArcaneBlast
-	end
-	if Mage:SpellReady(AR.ArcaneMissiles) and buff[AR.Clearcasting].count > 0 then
-		return AR.ArcaneExplosion
-	end
-	if Mage:SpellReady(AR.NetherTempest) and debuff[AR.NetherTempest].refreshable and chargeCount == 4 then
-		return AR.NetherTempest
-	end
-	if Mage:SpellReady(AR.ArcaneBarrage) and chargeCount == 4 and manaPct < 60 then
-		return AR.ArcaneBarrage
-	end
-	if Mage:SpellReady(AR.ArcaneBlast) then
-		return AR.ArcaneExplosion
-	end
+    local callactionCheck = Arcane:callaction()
+    if callactionCheck then
+        return Arcane:callaction()
+    end
 end
