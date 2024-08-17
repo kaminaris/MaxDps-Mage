@@ -267,7 +267,7 @@ end
 
 function Arcane:callaction()
     if (MaxDps:FindSpell(classtable.Counterspell) and CheckSpellCosts(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
-        MaxDps:GlowCooldown(classtable.Counterspell, select(8,UnitCastingInfo('target') == false) and cooldown[classtable.Counterspell].ready)
+        MaxDps:GlowCooldown(classtable.Counterspell, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
     if debuff[classtable.TouchoftheMagiDeBuff].up and opener then
         opener = false
