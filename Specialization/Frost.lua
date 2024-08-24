@@ -70,26 +70,6 @@ local Frost = {}
 local function CheckSpellCosts(spell,spellstring)
     if not IsSpellKnown(spell) then return false end
     if not C_Spell.IsSpellUsable(spell) then return false end
-    if spellstring == 'TouchofDeath' then
-        if targethealthPerc > 15 then
-            return false
-        end
-    end
-    if spellstring == 'KillShot' then
-        if (classtable.SicEmBuff and not buff[classtable.SicEmBuff].up) or (classtable.HuntersPreyBuff and not buff[classtable.HuntersPreyBuff].up) and targethealthPerc > 15 then
-            return false
-        end
-    end
-    if spellstring == 'HammerofWrath' then
-        if ( (classtable.AvengingWrathBuff and not buff[classtable.AvengingWrathBuff].up) or (classtable.FinalVerdictBuff and not buff[classtable.FinalVerdictBuff].up) ) and targethealthPerc > 20 then
-            return false
-        end
-    end
-    if spellstring == 'Execute' then
-        if (classtable.SuddenDeathBuff and not buff[classtable.SuddenDeathBuff].up) and targethealthPerc > 35 then
-            return false
-        end
-    end
     local costs = C_Spell.GetSpellPowerCost(spell)
     if type(costs) ~= 'table' and spellstring then return true end
     for i,costtable in pairs(costs) do
@@ -224,6 +204,9 @@ function Frost:aoe()
     if (CheckSpellCosts(classtable.IceNova, 'IceNova')) and (targets >= 4 and ( not talents[classtable.GlacialSpike] or not freezable )) and cooldown[classtable.IceNova].ready then
         return classtable.IceNova
     end
+    if (CheckSpellCosts(classtable.ConeofCold, 'ConeofCold')) and ((LibRangeCheck and LibRangeCheck:GetRange('target', false, true) or 0) >= 8 and not talents[classtable.ColdestSnap] and targets >= 7) and cooldown[classtable.ConeofCold].ready then
+        return classtable.ConeofCold
+    end
     if (CheckSpellCosts(classtable.DragonsBreath, 'DragonsBreath')) and (targets >= 7) and cooldown[classtable.DragonsBreath].ready then
         return classtable.DragonsBreath
     end
@@ -250,7 +233,7 @@ function Frost:cleave()
     if (CheckSpellCosts(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold)) and cooldown[classtable.CometStorm].ready then
         return classtable.CometStorm
     end
-    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and ( ( (MaxDps.spellHistory[1] == classtable.Frostbolt) and buff[classtable.IciclesBuff].count >= 3 ) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) or ( buff[classtable.IciclesBuff].count >= 3 and buff[classtable.IciclesBuff].count <5 and cooldown[classtable.Flurry].charges == 2 ) )) and cooldown[classtable.Flurry].ready then
+    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and ( ( ( (MaxDps.spellHistory[1] == classtable.Frostbolt) or (MaxDps.spellHistory[1] == classtable.FrostfireBolt) ) and buff[classtable.IciclesBuff].count >= 3 ) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) or ( buff[classtable.IciclesBuff].count >= 3 and buff[classtable.IciclesBuff].count <5 and cooldown[classtable.Flurry].charges == 2 ) )) and cooldown[classtable.Flurry].ready then
         return classtable.Flurry
     end
     if (CheckSpellCosts(classtable.IceLance, 'IceLance')) and (talents[classtable.GlacialSpike] and not debuff[classtable.WintersChillDeBuff].up and buff[classtable.IciclesBuff].count == 4 and buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.IceLance].ready then
@@ -308,11 +291,43 @@ function Frost:movement()
     --    return classtable.IceLance
     --end
 end
+function Frost:ss_st()
+    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 0 and not debuff[classtable.WintersChillDeBuff].up and ( (MaxDps.spellHistory[1] == classtable.Frostbolt) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) )) and cooldown[classtable.Flurry].ready then
+        return classtable.Flurry
+    end
+    if (CheckSpellCosts(classtable.IceLance, 'IceLance')) and (buff[classtable.IcyVeinsBuff].up and debuff[classtable.WintersChillDeBuff].count == 2) and cooldown[classtable.IceLance].ready then
+        return classtable.IceLance
+    end
+    if (CheckSpellCosts(classtable.RayofFrost, 'RayofFrost')) and (not buff[classtable.IcyVeinsBuff].up and not buff[classtable.FreezingWindsBuff].up and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 1) and cooldown[classtable.RayofFrost].ready then
+        return classtable.RayofFrost
+    end
+    if (CheckSpellCosts(classtable.FrozenOrb, 'FrozenOrb')) and cooldown[classtable.FrozenOrb].ready then
+        return classtable.FrozenOrb
+    end
+    if (CheckSpellCosts(classtable.ShiftingPower, 'ShiftingPower')) and cooldown[classtable.ShiftingPower].ready then
+        return classtable.ShiftingPower
+    end
+    if (CheckSpellCosts(classtable.IceLance, 'IceLance')) and ((debuff[classtable.WintersChillDeBuff].up and 1 or 0) or buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.IceLance].ready then
+        return classtable.IceLance
+    end
+    if (CheckSpellCosts(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold) or (classtable and classtable.Splinterstorm and GetSpellCooldown(classtable.Splinterstorm).duration >=5 )) and cooldown[classtable.CometStorm].ready then
+        return classtable.CometStorm
+    end
+    if (CheckSpellCosts(classtable.GlacialSpike, 'GlacialSpike')) and (buff[classtable.IciclesBuff].count == 5) and cooldown[classtable.GlacialSpike].ready then
+        return classtable.GlacialSpike
+    end
+    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and buff[classtable.IcyVeinsBuff].up) and cooldown[classtable.Flurry].ready then
+        return classtable.Flurry
+    end
+    if (CheckSpellCosts(classtable.Frostbolt, 'Frostbolt')) and cooldown[classtable.Frostbolt].ready then
+        return classtable.Frostbolt
+    end
+end
 function Frost:st()
     if (CheckSpellCosts(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold)) and cooldown[classtable.CometStorm].ready then
         return classtable.CometStorm
     end
-    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 0 and not debuff[classtable.WintersChillDeBuff].up and ( ( (MaxDps.spellHistory[1] == classtable.Frostbolt) and buff[classtable.IciclesBuff].count >= 3 or (MaxDps.spellHistory[1] == classtable.Frostbolt) and buff[classtable.BrainFreezeBuff].up ) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) or talents[classtable.GlacialSpike] and buff[classtable.IciclesBuff].count == 4 and not buff[classtable.FingersofFrostBuff].up )) and cooldown[classtable.Flurry].ready then
+    if (CheckSpellCosts(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 0 and not debuff[classtable.WintersChillDeBuff].up and ( ( ( (MaxDps.spellHistory[1] == classtable.Frostbolt) or (MaxDps.spellHistory[1] == classtable.FrostfireBolt) ) and buff[classtable.IciclesBuff].count >= 3 or ( (MaxDps.spellHistory[1] == classtable.Frostbolt) or (MaxDps.spellHistory[1] == classtable.FrostfireBolt) ) and buff[classtable.BrainFreezeBuff].up ) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) or talents[classtable.GlacialSpike] and buff[classtable.IciclesBuff].count == 4 and not buff[classtable.FingersofFrostBuff].up ) or buff[classtable.ExcessFrostBuff].up and buff[classtable.FrostfireEmpowermentBuff].up) and cooldown[classtable.Flurry].ready then
         return classtable.Flurry
     end
     if (CheckSpellCosts(classtable.IceLance, 'IceLance')) and (talents[classtable.GlacialSpike] and not debuff[classtable.WintersChillDeBuff].up and buff[classtable.IciclesBuff].count == 4 and buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.IceLance].ready then
@@ -374,6 +389,12 @@ function Frost:callaction()
             return Frost:cleave()
         end
     end
+    if (talents[classtable.Splinterstorm]) then
+        local ss_stCheck = Frost:ss_st()
+        if ss_stCheck then
+            return Frost:ss_st()
+        end
+    end
     local stCheck = Frost:st()
     if stCheck then
         return stCheck
@@ -428,6 +449,9 @@ function Mage:Frost()
     classtable.BrainFreezeBuff = 190446
     classtable.FingersofFrostBuff = 44544
     classtable.IceFloesBuff = 108839
+    classtable.FreezingWindsBuff = 0
+    classtable.ExcessFrostBuff = 0
+    classtable.FrostfireEmpowermentBuff = 0
     classtable.FreezingRainBuff = 270232
 
     local precombatCheck = Frost:precombat()
