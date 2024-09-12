@@ -104,9 +104,9 @@ function Arcane:precombat()
     --end
 end
 function Arcane:cd_opener()
-    --if (MaxDps:CheckSpellUsable(classtable.TouchoftheMagi, 'TouchoftheMagi')) and (( (MaxDps.spellHistory[1] == classtable.ArcaneBarrage) and ( (cooldown[classtable.ArcaneBarrage].duration >0 and cooldown[classtable.ArcaneBarrage].duration /100) <= 0.5 or gcd <= 0.5 ) and ( buff[classtable.ArcaneSurgeBuff].up or cooldown[classtable.ArcaneSurge].remains >30 ) ) or ( (MaxDps.spellHistory[1] == classtable.ArcaneSurge) and ArcaneCharges <4 )) and cooldown[classtable.TouchoftheMagi].ready then
-    --    return classtable.TouchoftheMagi
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.TouchoftheMagi, 'TouchoftheMagi')) and (( (MaxDps.spellHistory[1] == classtable.ArcaneBarrage) and ( buff[classtable.ArcaneSurgeBuff].up or cooldown[classtable.ArcaneSurge].remains >30 ) ) or ( (MaxDps.spellHistory[1] == classtable.ArcaneSurge) and ArcaneCharges <4 )) and cooldown[classtable.TouchoftheMagi].ready then
+        return classtable.TouchoftheMagi
+    end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.PresenceofMindBuff].up) and cooldown[classtable.ArcaneBlast].ready then
         return classtable.ArcaneBlast
     end
