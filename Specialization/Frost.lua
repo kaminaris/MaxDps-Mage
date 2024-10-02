@@ -78,9 +78,9 @@ end
 
 
 function Frost:precombat()
-    --if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and cooldown[classtable.ArcaneIntellect].ready then
-    --    return classtable.ArcaneIntellect
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and cooldown[classtable.ArcaneIntellect].ready then
+        return classtable.ArcaneIntellect
+    end
     --if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
     --    return classtable.MirrorImage
     --end
@@ -434,6 +434,7 @@ function Mage:Frost()
     classtable.IciclesBuff = 205473
     classtable.IceFloesBuff = 108839
     classtable.FreezingRainBuff = 270232
+    classtable.ArcaneIntellectBuff = 1459
 
     local precombatCheck = Frost:precombat()
     if precombatCheck then
