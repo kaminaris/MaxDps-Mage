@@ -82,9 +82,9 @@ end
 
 
 function Arcane:precombat()
-    --if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and cooldown[classtable.ArcaneIntellect].ready then
-    --    return classtable.ArcaneIntellect
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and not UnitAffectingCombat('player') and cooldown[classtable.ArcaneIntellect].ready then
+        return classtable.ArcaneIntellect
+    end
     aoe_target_count = 2
     if not talents[classtable.ArcingCleave] then
         aoe_target_count = 9
@@ -93,9 +93,9 @@ function Arcane:precombat()
     if talents[classtable.HighVoltage] then
         alt_rotation = 1
     end
-    --if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
-    --    return classtable.MirrorImage
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
+        MaxDps:GlowCooldown(classtable.MirrorImage, cooldown[classtable.MirrorImage].ready)
+    end
     --if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (not talents[classtable.Evocation]) and cooldown[classtable.ArcaneBlast].ready then
     --    return classtable.ArcaneBlast
     --end
@@ -291,6 +291,7 @@ function Mage:Arcane()
     classtable.AetherAttunementBuff = 453601
     classtable.GloriousIncandescenceBuff = 451073
     classtable.BurdenofPowerBuff = 451049
+	classtable.ArcaneIntellectBuff = 1459
 
     local precombatCheck = Arcane:precombat()
     if precombatCheck then
