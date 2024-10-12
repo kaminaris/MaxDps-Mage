@@ -82,7 +82,7 @@ end
 
 
 function Arcane:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and not UnitAffectingCombat('player') and cooldown[classtable.ArcaneIntellect].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and cooldown[classtable.ArcaneIntellect].ready then
         return classtable.ArcaneIntellect
     end
     aoe_target_count = 2

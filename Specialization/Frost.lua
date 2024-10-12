@@ -78,7 +78,7 @@ end
 
 
 function Frost:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and not UnitAffectingCombat('player') and cooldown[classtable.ArcaneIntellect].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and (not buff[classtable.ArcaneIntellectBuff].up) and cooldown[classtable.ArcaneIntellect].ready then
         return classtable.ArcaneIntellect
     end
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
@@ -150,7 +150,7 @@ function Frost:cds()
         return classtable.Flurry
     end
     if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and cooldown[classtable.IcyVeins].ready then
-        return classtable.IcyVeins
+		MaxDps:GlowCooldown(classtable.IcyVeins, cooldown[classtable.IcyVeins].ready)
     end
 end
 function Frost:ss_cleave()
@@ -435,6 +435,8 @@ function Mage:Frost()
     classtable.IceFloesBuff = 108839
     classtable.FreezingRainBuff = 270232
 	classtable.ArcaneIntellectBuff = 1459
+	classtable.ConeofCold = 120
+	classtable.ColdestSnap = 417493
 
     local precombatCheck = Frost:precombat()
     if precombatCheck then
