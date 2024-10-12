@@ -99,16 +99,16 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
-    if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
-        if not setSpell then setSpell = classtable.WaterElemental end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
+        --if not setSpell then setSpell = classtable.WaterElemental end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
         MaxDps:GlowCooldown(classtable.Counterspell, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
     if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (mana_gem_charges <3) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (mana_pct <40 and ( buff[classtable.IcyVeinsBuff].up or MaxDps:Bloodlust() )) and cooldown[classtable.Evocation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <40 and ( buff[classtable.IcyVeinsBuff].up or MaxDps:Bloodlust() )) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (mana_deficit >12500) and cooldown[classtable.ManaGem].ready then
@@ -183,6 +183,10 @@ function Mage:Frost()
     classtable.Tier132pcBuff = 0
     classtable.FingersofFrostBuff = 44544
     classtable.BrainFreezeBuff = 190446
+	classtable.FrostfireOrb = 84721
+	classtable.ManaGem = 759
+	classtable.WaterElemental = 31687	
+	
     setSpell = nil
     ClearCDs()
 
