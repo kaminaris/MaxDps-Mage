@@ -172,7 +172,7 @@ function Frost:ss_cleave()
     if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and ((debuff[classtable.WintersChillDeBuff].up) or buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold) or debuff[classtable.EmbeddedFrostSplinterDeBuff].maxStacks / count * 100 == 100) and cooldown[classtable.CometStorm].ready then
+    if (MaxDps:CheckSpellUsable(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold) or 8 / debuff[classtable.EmbeddedFrostSplinterDeBuff].count * 100 == 100) and cooldown[classtable.CometStorm].ready then
         if not setSpell then setSpell = classtable.CometStorm end
     end
     if (MaxDps:CheckSpellUsable(classtable.GlacialSpike, 'GlacialSpike')) and (buff[classtable.IciclesBuff].up == 5) and cooldown[classtable.GlacialSpike].ready then
@@ -256,7 +256,7 @@ function Frost:ss_st()
     if (MaxDps:CheckSpellUsable(classtable.Flurry, 'Flurry')) and (cooldown[classtable.Flurry].ready and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 0 and not debuff[classtable.WintersChillDeBuff].up and ( (MaxDps.spellHistory[1] == classtable.Frostbolt) or (MaxDps.spellHistory[1] == classtable.GlacialSpike) )) and cooldown[classtable.Flurry].ready then
         if not setSpell then setSpell = classtable.Flurry end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.IcyVeinsBuff].up and ( debuff[classtable.WintersChillDeBuff].count == 2 or debuff[classtable.WintersChillDeBuff].count == 1 and debuff[classtable.EmbeddedFrostSplinterDeBuff].maxStacks / count * 100 == 100 )) and cooldown[classtable.IceLance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.IcyVeinsBuff].up and ( debuff[classtable.WintersChillDeBuff].count == 2 or debuff[classtable.WintersChillDeBuff].count == 1 and 8 / debuff[classtable.EmbeddedFrostSplinterDeBuff].count * 100 == 100 )) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
     if (MaxDps:CheckSpellUsable(classtable.RayofFrost, 'RayofFrost')) and (not buff[classtable.IcyVeinsBuff].up and not buff[classtable.FreezingWindsBuff].up and (debuff[classtable.WintersChillDeBuff].up and 1 or 0) == 1) and cooldown[classtable.RayofFrost].ready then
@@ -271,13 +271,13 @@ function Frost:ss_st()
     if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and ((debuff[classtable.WintersChillDeBuff].up)) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold) or debuff[classtable.EmbeddedFrostSplinterDeBuff].maxStacks / count * 100 == 100) and cooldown[classtable.CometStorm].ready then
+    if (MaxDps:CheckSpellUsable(classtable.CometStorm, 'CometStorm')) and ((MaxDps.spellHistory[1] == classtable.Flurry) or (MaxDps.spellHistory[1] == classtable.ConeofCold) or 8 / debuff[classtable.EmbeddedFrostSplinterDeBuff].count * 100 == 100) and cooldown[classtable.CometStorm].ready then
         if not setSpell then setSpell = classtable.CometStorm end
     end
     if (MaxDps:CheckSpellUsable(classtable.GlacialSpike, 'GlacialSpike')) and (buff[classtable.IciclesBuff].count == 5) and cooldown[classtable.GlacialSpike].ready then
         if not setSpell then setSpell = classtable.GlacialSpike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Flurry, 'Flurry')) and (buff[classtable.IcyVeinsBuff].up and debuff[classtable.EmbeddedFrostSplinterDeBuff].maxStacks / count * 100 <100) and cooldown[classtable.Flurry].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Flurry, 'Flurry')) and (buff[classtable.IcyVeinsBuff].up and 8 / debuff[classtable.EmbeddedFrostSplinterDeBuff].count * 100 <100) and cooldown[classtable.Flurry].ready then
         if not setSpell then setSpell = classtable.Flurry end
     end
     if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.IceLance].ready then
