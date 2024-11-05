@@ -82,22 +82,22 @@ local function ClearCDs()
 end
 
 function Fire:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and not buff[classtable.ArcaneBrilliance].up and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MageArmorBuff].up and not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
-        if not setSpell then setSpell = classtable.MoltenArmor end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (mana_pct >45 and buff[classtable.MageArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
-        if not setSpell then setSpell = classtable.MoltenArmor end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MageArmorBuff].up and not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
+    --    if not setSpell then setSpell = classtable.MoltenArmor end
+    --end
+    --if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (ManaPerc >45 and buff[classtable.MageArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
+    --    if not setSpell then setSpell = classtable.MoltenArmor end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
         MaxDps:GlowCooldown(classtable.Counterspell, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (mana_gem_charges <3) and cooldown[classtable.ConjureManaGem].ready then
-        if not setSpell then setSpell = classtable.ConjureManaGem end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (mana_deficit >12500) and cooldown[classtable.ManaGem].ready then
+    --if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (mana_gem_charges <3) and cooldown[classtable.ConjureManaGem].ready then
+    --    if not setSpell then setSpell = classtable.ConjureManaGem end
+    --end
+    if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaDeficit >12500) and cooldown[classtable.ManaGem].ready then
         if not setSpell then setSpell = classtable.ManaGem end
     end
     if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and cooldown[classtable.Scorch].ready then
@@ -121,7 +121,7 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.Fireball, 'Fireball')) and cooldown[classtable.Fireball].ready then
         if not setSpell then setSpell = classtable.Fireball end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and (mana_pct <5 and not buff[classtable.MageArmorBuff].up) and cooldown[classtable.MageArmor].ready then
+    if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and (ManaPerc <5 and not buff[classtable.MageArmorBuff].up) and cooldown[classtable.MageArmor].ready then
         if not setSpell then setSpell = classtable.MageArmor end
     end
     if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and cooldown[classtable.Scorch].ready then
