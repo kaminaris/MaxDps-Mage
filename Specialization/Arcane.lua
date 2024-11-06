@@ -120,7 +120,7 @@ function Arcane:cd_opener()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and ((MaxDps.spellHistory[1] == classtable.Evocation) or (MaxDps.spellHistory[1] == classtable.ArcaneOrb)) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneSurge, 'ArcaneSurge')) and (cooldown[classtable.TouchoftheMagi].remains <( 2 + ( gcd * ( ArcaneCharges == 4 ) ) )) and cooldown[classtable.ArcaneSurge].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneSurge, 'ArcaneSurge')) and (cooldown[classtable.TouchoftheMagi].remains <( 2 + ( gcd * ( ArcaneCharges == 4 and 1 or 0 ) ) )) and cooldown[classtable.ArcaneSurge].ready then
         if not setSpell then setSpell = classtable.ArcaneSurge end
     end
 end
