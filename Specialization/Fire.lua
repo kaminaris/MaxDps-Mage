@@ -102,28 +102,29 @@ local function castTime()
     if endTime and endTime > 0 then
         return endTime/1000 - GetTime()
     end
+    return math.huge
 end
 
 function Fire:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and cooldown[classtable.ArcaneIntellect].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneIntellect, 'ArcaneIntellect')) and not buff[classtable.ArcaneIntellect].up and cooldown[classtable.ArcaneIntellect].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.ArcaneIntellect end
     end
-    if firestarter_combustion <0 then
-        firestarter_combustion = talents[classtable.SunKingsBlessing]
+    if firestarter_combustion == nil or firestarter_combustion <0 then
+        firestarter_combustion = talents[classtable.SunKingsBlessing] or 0
     end
-    if hot_streak_flamestrike == 0 then
-        hot_streak_flamestrike = 4 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] ) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] )
+    if hot_streak_flamestrike == nil or hot_streak_flamestrike == 0 then
+        hot_streak_flamestrike = 4 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] or 1 ) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] and 2 or 1)
     end
-    if hard_cast_flamestrike == 0 then
+    if hard_cast_flamestrike == nil or hard_cast_flamestrike == 0 then
         hard_cast_flamestrike = 999
     end
-    if combustion_flamestrike == 0 then
-        combustion_flamestrike = 4 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] ) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] )
+    if combustion_flamestrike == nil or combustion_flamestrike == 0 then
+        combustion_flamestrike = 4 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] or 1) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] and 2 or 1 )
     end
-    if skb_flamestrike == 0 then
-        skb_flamestrike = 3 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] ) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] )
+    if skb_flamestrike == nil or skb_flamestrike == 0 then
+        skb_flamestrike = 3 * ( talents[classtable.Quickflame] or talents[classtable.FlamePatch] or 1) + 999 * ( not talents[classtable.FlamePatch] and not talents[classtable.Quickflame] and 2 or 1)
     end
-    if arcane_explosion == 0 then
+    if arcane_explosion == nil or arcane_explosion == 0 then
         arcane_explosion = 999
     end
     arcane_explosion_mana = 40
@@ -185,10 +186,10 @@ function Fire:combustion_phase()
     if (MaxDps:CheckSpellUsable(classtable.PhoenixFlames, 'PhoenixFlames')) and (talents[classtable.SpellfireSpheres] and talents[classtable.PhoenixReborn] and buff[classtable.HeatingUpBuff].up and not buff[classtable.HotStreakBuff].up and buff[classtable.FlamesFuryBuff].up) and cooldown[classtable.PhoenixFlames].ready then
         if not setSpell then setSpell = classtable.PhoenixFlames end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'FireBlast')) and (( not ta_combust or talents[classtable.SunKingsBlessing] ) and not fire_blast_pooling and ( not buff[classtable.ImprovedScorch].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Scorch)) or debuff[classtable.ImprovedScorchDeBuff].remains >4 * gcd ) and ( not buff[classtable.FuryoftheSunKingBuff].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Pyroblast)) ) and buff[classtable.CombustionBuff].up and not buff[classtable.HotStreakBuff].up and 1 + buff[classtable.HeatingUpBuff].count * ( gcd >0 ) <2) and cooldown[classtable.FireBlast].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'FireBlast')) and (( not ta_combust or talents[classtable.SunKingsBlessing] ) and not fire_blast_pooling and ( not buff[classtable.ImprovedScorch].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Scorch)) or debuff[classtable.ImprovedScorchDeBuff].remains >4 * gcd ) and ( not buff[classtable.FuryoftheSunKingBuff].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Pyroblast)) ) and buff[classtable.CombustionBuff].up and not buff[classtable.HotStreakBuff].up and 1 + buff[classtable.HeatingUpBuff].count * ( gcd >0 and 1 or 0) <2) and cooldown[classtable.FireBlast].ready then
         if not setSpell then setSpell = classtable.FireBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'FireBlast')) and (ta_combust and not fire_blast_pooling and cooldown[classtable.FireBlast].charges >2.5 and ( not buff[classtable.ImprovedScorch].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Scorch)) or debuff[classtable.ImprovedScorchDeBuff].remains >4 * gcd ) and ( not buff[classtable.FuryoftheSunKingBuff].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Pyroblast)) ) and buff[classtable.CombustionBuff].up and not buff[classtable.HotStreakBuff].up and 1 + buff[classtable.HeatingUpBuff].count * ( gcd >0 ) <2) and cooldown[classtable.FireBlast].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'FireBlast')) and (ta_combust and not fire_blast_pooling and cooldown[classtable.FireBlast].charges >2.5 and ( not buff[classtable.ImprovedScorch].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Scorch)) or debuff[classtable.ImprovedScorchDeBuff].remains >4 * gcd ) and ( not buff[classtable.FuryoftheSunKingBuff].up or (C_Spell and C_Spell.IsCurrentSpell(classtable.Pyroblast)) ) and buff[classtable.CombustionBuff].up and not buff[classtable.HotStreakBuff].up and 1 + buff[classtable.HeatingUpBuff].count * ( gcd >0 and 1 or 0) <2) and cooldown[classtable.FireBlast].ready then
         if not setSpell then setSpell = classtable.FireBlast end
     end
     if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and (( buff[classtable.HotStreakBuff].up and targets >= combustion_flamestrike ) or ( buff[classtable.HyperthermiaBuff].up and targets >= combustion_flamestrike - (talents[classtable.Hyperthermia] and talents[classtable.Hyperthermia] or 0) )) and cooldown[classtable.Flamestrike].ready then
@@ -237,7 +238,7 @@ end
 function Fire:combustion_timing()
     local combustion_ready_time = cooldown[classtable.Combustion].remains
     one = cooldown[classtable.Combustion].remains
-    one = ( classtable and classtable.Fireball and GetSpellInfo(classtable.Fireball).castTime / 1000 ) * ( targets <combustion_flamestrike ) + ( classtable and classtable.Flamestrike and GetSpellInfo(classtable.Flamestrike).castTime / 1000 ) * ( targets >= combustion_flamestrike ) - combustion_cast_remains
+    one = ( classtable and classtable.Fireball and GetSpellInfo(classtable.Fireball).castTime / 1000 ) * ( targets <combustion_flamestrike and 1 or 0) + ( classtable and classtable.Flamestrike and GetSpellInfo(classtable.Flamestrike).castTime / 1000 ) * ( targets >= combustion_flamestrike and 1 or 0) - combustion_cast_remains
     one = combustion_ready_time
     if talents[classtable.Firestarter] and not firestarter_combustion then
         one = (targethealthPerc >=90 and math.huge or 0) --firestarter.remains
@@ -331,11 +332,14 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PhoenixFlames, 'PhoenixFlames')) and (timeInCombat <0.5) and cooldown[classtable.PhoenixFlames].ready then
         if not setSpell then setSpell = classtable.PhoenixFlames end
     end
+    if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (not buff[classtable.CombustionBuff].up) and cooldown[classtable.Combustion].ready then
+        if not setSpell then setSpell = classtable.Combustion end
+    end
     Fire:combustion_timing()
-    shifting_power_before_combustion = cooldown[classtable.combustion].duration >cooldown[classtable.ShiftingPower].remains
+    shifting_power_before_combustion = (cooldown[classtable.combustion].duration >cooldown[classtable.ShiftingPower].remains and 1 or 0)
     --item_cutoff_active = ( cooldown[classtable.combustion].duration <on_use_cutoff or buff[classtable.CombustionBuff].remains >skb_duration and not cooldown[classtable.ItemCd1141].ready==false ) and ( ( trinket.1.has_cooldown and MaxDps:CheckTrinketCooldown('1') <on_use_cutoff ) + ( trinket.2.has_cooldown and MaxDps:CheckTrinketCooldown('2') <on_use_cutoff ) >1 )
     one = not buff[classtable.CombustionBuff].up and cooldown[classtable.FireBlast].charges + ( cooldown[classtable.combustion].duration + 12 * shifting_power_before_combustion ) % cooldown[classtable.FireBlast].duration - 1 <cooldown[classtable.FireBlast].maxCharges + overpool_fire_blasts % cooldown[classtable.FireBlast].duration - ( buff[classtable.CombustionBuff].duration % cooldown[classtable.FireBlast].duration ) % 1 and cooldown[classtable.combustion].duration <ttd
-    local combustion_precast_time = ( classtable and classtable.Fireball and GetSpellInfo(classtable.Fireball).castTime / 1000 ) *(targets<combustion_flamestrike)+( classtable and classtable.Flamestrike and GetSpellInfo(classtable.Flamestrike).castTime / 1000 )*(targets>=combustion_flamestrike)-combustion_cast_remains
+    local combustion_precast_time = ( classtable and classtable.Fireball and GetSpellInfo(classtable.Fireball).castTime / 1000 ) *(targets<combustion_flamestrike and 1 or 0)+( classtable and classtable.Flamestrike and GetSpellInfo(classtable.Flamestrike).castTime / 1000 )*(targets>=combustion_flamestrike and 1 or 0)-combustion_cast_remains
     if (cooldown[classtable.combustion].duration <= 0 or buff[classtable.CombustionBuff].up or cooldown[classtable.combustion].duration <combustion_precast_time and cooldown[classtable.Combustion].remains <combustion_precast_time) then
         Fire:combustion_phase()
     end
@@ -396,17 +400,17 @@ function Mage:Fire()
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.CombustionBuff = 0
+    classtable.CombustionBuff = 190319
     classtable.SunKingsBlessingBuff = 0
-    classtable.HotStreakBuff = 0
+    classtable.HotStreakBuff = 48108
     classtable.FeeltheBurnBuff = 0
     classtable.FuryoftheSunKingBuff = 0
     classtable.FlameAccelerantBuff = 0
     classtable.FrostfireEmpowermentBuff = 0
-    classtable.HeatingUpBuff = 0
+    classtable.HeatingUpBuff = 48107
     classtable.FlamesFuryBuff = 0
-    classtable.ImprovedScorchDeBuff = 0
-    classtable.HyperthermiaBuff = 0
+    classtable.ImprovedScorchDeBuff = 383608
+    classtable.HyperthermiaBuff = 383874
     classtable.ExcessFrostBuff = 0
     classtable.HeatShimmerBuff = 0
     classtable.bloodlust = 0
