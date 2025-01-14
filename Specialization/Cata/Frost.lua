@@ -93,21 +93,27 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and not buff[classtable.ArcaneBrilliance].up and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
-    --if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and cooldown[classtable.MoltenArmor].ready then
-    --    if not setSpell then setSpell = classtable.MoltenArmor end
-    --end
-    --if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
-        --if not setSpell then setSpell = classtable.WaterElemental end
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and cooldown[classtable.MoltenArmor].ready then
+        if not setSpell then setSpell = classtable.MoltenArmor end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
+        if not setSpell then setSpell = classtable.WaterElemental end
+    end
     if (MaxDps:CheckSpellUsable(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
         MaxDps:GlowCooldown(classtable.Counterspell, ( select(8,UnitCastingInfo('target')) ~= nil and not select(8,UnitCastingInfo('target')) or select(7,UnitChannelInfo('target')) ~= nil and not select(7,UnitChannelInfo('target'))) )
     end
-    --if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (mana_gem_charges <3) and cooldown[classtable.ConjureManaGem].ready then
-    --    if not setSpell then setSpell = classtable.ConjureManaGem end
-    --end
+    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <3) and cooldown[classtable.ConjureManaGem].ready then
+        if not setSpell then setSpell = classtable.ConjureManaGem end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (not UnitAffectingCombat('player')) and cooldown[classtable.VolcanicPotion].ready then
+        if not setSpell then setSpell = classtable.VolcanicPotion end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust() or buff[classtable.IcyVeinsBuff].up or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
+        if not setSpell then setSpell = classtable.VolcanicPotion end
+    end
     if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <40 and ( buff[classtable.IcyVeinsBuff].up or MaxDps:Bloodlust() )) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
@@ -135,7 +141,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].count >1) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].up and 0 <gcd) and cooldown[classtable.IceLance].ready then -- pet.water_elemental.cooldown.freeze.remains
+    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].up and pet.water_elemental.cooldown.freeze.remains <gcd) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
     if (MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt')) and cooldown[classtable.Frostbolt].ready then
@@ -173,19 +179,26 @@ function Mage:Frost()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
+    classtable.ManaGem = 36799
+    ManaGemCharges = C_Item.GetItemCount(classtable.ManaGem,false, true) or 0
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
     classtable.bloodlust = 0
     classtable.IcyVeinsBuff = 12472
-    classtable.FrostfireOrbDeBuff = 0
+    classtable.FrostfireOrbDeBuff = 92283
     classtable.Tier132pcBuff = 0
     classtable.FingersofFrostBuff = 44544
     classtable.BrainFreezeBuff = 190446
-	classtable.FrostfireOrb = 84721
-	classtable.ManaGem = 759
-	classtable.WaterElemental = 31687
+
+    local function debugg()
+    end
+
+
+    if MaxDps.db.global.debugMode then
+        debugg()
+    end
 
     setSpell = nil
     ClearCDs()
