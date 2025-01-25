@@ -141,7 +141,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].count >1) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].up and pet.water_elemental.cooldown.freeze.remains <gcd) and cooldown[classtable.IceLance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IceLance, 'IceLance')) and (buff[classtable.FingersofFrostBuff].up and cooldown[classtable.Freeze].remains <gcd) and cooldown[classtable.IceLance].ready then
         if not setSpell then setSpell = classtable.IceLance end
     end
     if (MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt')) and cooldown[classtable.Frostbolt].ready then
