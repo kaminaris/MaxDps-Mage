@@ -61,6 +61,7 @@ local Mana
 local ManaMax
 local ManaDeficit
 local ManaPerc
+local ManaGemCharges
 
 local Frost = {}
 
@@ -111,10 +112,10 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (not UnitAffectingCombat('player')) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust() or buff[classtable.IcyVeinsBuff].up or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust(1) or buff[classtable.IcyVeinsBuff].up or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <40 and ( buff[classtable.IcyVeinsBuff].up or MaxDps:Bloodlust() )) and cooldown[classtable.Evocation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <40 and ( buff[classtable.IcyVeinsBuff].up or MaxDps:Bloodlust(1) )) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaDeficit >12500) and cooldown[classtable.ManaGem].ready then
@@ -129,7 +130,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and (ttd >= 25) and cooldown[classtable.MirrorImage].ready then
         if not setSpell then setSpell = classtable.MirrorImage end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and (not buff[classtable.IcyVeinsBuff].up and MaxDps:Bloodlust() and ( buff[classtable.Tier132pcBuff].count >7 or cooldown[classtable.ColdSnap].remains <22 )) and cooldown[classtable.IcyVeins].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and (not buff[classtable.IcyVeinsBuff].up and MaxDps:Bloodlust(1) and ( buff[classtable.Tier132pcBuff].count >7 or cooldown[classtable.ColdSnap].remains <22 )) and cooldown[classtable.IcyVeins].ready then
         if not setSpell then setSpell = classtable.IcyVeins end
     end
     if (MaxDps:CheckSpellUsable(classtable.DeepFreeze, 'DeepFreeze')) and (buff[classtable.FingersofFrostBuff].up) and cooldown[classtable.DeepFreeze].ready then
@@ -179,18 +180,30 @@ function Mage:Frost()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    classtable.ManaGem = 36799
-    ManaGemCharges = C_Item.GetItemCount(classtable.ManaGem,false, true) or 0
+    ManaGemCharges = C_Item.GetItemCount(5500, true)
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.bloodlust = 0
     classtable.IcyVeinsBuff = 12472
-    classtable.FrostfireOrbDeBuff = 92283
-    classtable.Tier132pcBuff = 0
     classtable.FingersofFrostBuff = 44544
-    classtable.BrainFreezeBuff = 190446
+    classtable.BrainFreezeBuff = 57761
+    classtable.ArcaneBrilliance = 1459
+    classtable.MoltenArmor = 30482
+    classtable.WaterElemental = 1
+    classtable.Counterspell = 2139
+    classtable.ConjureManaGem = 759
+    classtable.VolcanicPotion = 58091
+    classtable.Evocation = 12051
+    classtable.ManaGem = 3
+    classtable.ColdSnap = 11958
+    classtable.MirrorImage = 55342
+    classtable.IcyVeins = 12472
+    classtable.DeepFreeze = 44572
+    classtable.FrostfireBolt = 44614
+    classtable.IceLance = 30455
+    classtable.Frostbolt = 116
+    classtable.FireBlast = 2136
 
     local function debugg()
     end

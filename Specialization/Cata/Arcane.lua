@@ -61,6 +61,7 @@ local Mana
 local ManaMax
 local ManaDeficit
 local ManaPerc
+local ManaGemCharges
 
 local Arcane = {}
 
@@ -97,6 +98,12 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <3) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (not UnitAffectingCombat('player')) and cooldown[classtable.VolcanicPotion].ready then
+        if not setSpell then setSpell = classtable.VolcanicPotion end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (buff[classtable.ImprovedManaGemBuff].up or ttd <= 50) and cooldown[classtable.VolcanicPotion].ready then
+        if not setSpell then setSpell = classtable.VolcanicPotion end
+    end
     if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (( ( ManaMax >ManaMax and ManaPerc <= 40 ) or ( ManaMax == ManaMax and ManaPerc <= 35 ) ) and ttd >10) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
@@ -115,22 +122,22 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (buff[classtable.PresenceofMindBuff].up and ttd >cooldown[classtable.ManaGem].remains and ManaGemCharges == 0) and cooldown[classtable.ConjureManaGem].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (buff[classtable.PresenceofMindBuff].up and ttd >not cooldown[classtable.ManaGem].ready and ManaGemCharges == 0) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.PresenceofMindBuff].up) and cooldown[classtable.ArcaneBlast].ready then
         if not setSpell then setSpell = classtable.ArcaneBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (ttd <20 or ( ( cooldown[classtable.Evocation].remains <= 20 or buff[classtable.ImprovedManaGemBuff].up or cooldown[classtable.ManaGem].remains <5 ) and ManaPerc >= 22 ) or ( buff[classtable.ArcanePowerBuff].up and ManaPerc >88 )) and cooldown[classtable.ArcaneBlast].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (1 == 1 or ttd <20 or ( ( cooldown[classtable.Evocation].remains <= 20 or buff[classtable.ImprovedManaGemBuff].up or cooldown[classtable.ManaGem].remains <5 ) and ManaPerc >= 22 ) or ( buff[classtable.ArcanePowerBuff].up and ManaPerc >88 )) and cooldown[classtable.ArcaneBlast].ready then
         if not setSpell then setSpell = classtable.ArcaneBlast end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.ArcaneBlastBuff].remains <0.8 and buff[classtable.ArcaneBlastBuff].count == 4) and cooldown[classtable.ArcaneBlast].ready then
         if not setSpell then setSpell = classtable.ArcaneBlast end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (ManaPerc <92 and buff[classtable.ArcaneMissilesBuff].up and buff[classtable.MageArmorBuff].remains <= 2) and cooldown[classtable.ArcaneMissiles].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (ManaPerc <92 and buff[classtable.ArcaneMissilesBuff].up and buff[classtable.MageArmor].remains <= 2) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (ManaPerc <93 and buff[classtable.ArcaneMissilesBuff].up and buff[classtable.MageArmorBuff].remains >2) and cooldown[classtable.ArcaneMissiles].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (ManaPerc <93 and buff[classtable.ArcaneMissilesBuff].up and buff[classtable.MageArmor].remains >2) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (ManaPerc <87 and buff[classtable.ArcaneBlastBuff].count == 2) and cooldown[classtable.ArcaneBarrage].ready then
@@ -180,18 +187,32 @@ function Mage:Arcane()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    classtable.ManaGem = 36799
-    ManaGemCharges = C_Item.GetItemCount(classtable.ManaGem,false, true) or 0
+    ManaGemCharges = C_Item.GetItemCount(5500, true)
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.ImprovedManaGemBuff = 83098
-    classtable.ArcaneBlastBuff = 38881
-    classtable.Tier132pcBuff = 0
+    classtable.ArcaneBlastBuff = 36032
     classtable.ArcanePowerBuff = 12042
-    classtable.PresenceofMindBuff = 205025
-    classtable.ArcaneMissilesBuff = 0
+    classtable.PresenceofMindBuff = 12043
+    classtable.ArcaneMissilesBuff = 79683
+    classtable.FocusMagic = 54646
+    classtable.ArcaneBrilliance = 1459
+    classtable.MageArmor = 6117
+    classtable.Counterspell = 2139
+    classtable.ConjureManaGem = 759
+    classtable.VolcanicPotion = 58091
+    classtable.Evocation = 12051
+    classtable.FlameOrb = 82731
+    classtable.ManaGem = 3
+    classtable.ArcanePower = 12042
+    classtable.MirrorImage = 55342
+    classtable.PresenceofMind = 12043
+    classtable.ArcaneBlast = 30451
+    classtable.ArcaneMissiles = 5143
+    classtable.ArcaneBarrage = 44425
+    classtable.FireBlast = 2136
+    classtable.IceLance = 30455
 
     local function debugg()
     end

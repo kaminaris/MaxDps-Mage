@@ -61,6 +61,7 @@ local Mana
 local ManaMax
 local ManaDeficit
 local ManaPerc
+local ManaGemCharges
 
 local Fire = {}
 
@@ -100,7 +101,7 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (not UnitAffectingCombat('player')) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust() or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
+    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust(1) or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaDeficit >12500) and cooldown[classtable.ManaGem].ready then
@@ -118,8 +119,8 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and (not debuff[classtable.LivingBombDeBuff].up) and cooldown[classtable.LivingBomb].ready then
         if not setSpell then setSpell = classtable.LivingBomb end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Pyroblast, 'Pyroblast')) and (buff[classtable.HotStreakBuff].up) and cooldown[classtable.Pyroblast].ready then
-        if not setSpell then setSpell = classtable.Pyroblast end
+    if (MaxDps:CheckSpellUsable(classtable.PyroblastHs, 'PyroblastHs')) and (buff[classtable.HotStreakBuff].up) and cooldown[classtable.PyroblastHs].ready then
+        if not setSpell then setSpell = classtable.PyroblastHs end
     end
     if (MaxDps:CheckSpellUsable(classtable.FlameOrb, 'FlameOrb')) and (ttd >= 12) and cooldown[classtable.FlameOrb].ready then
         if not setSpell then setSpell = classtable.FlameOrb end
@@ -159,19 +160,30 @@ function Mage:Fire()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    classtable.ManaGem = 36799
-    ManaGemCharges = C_Item.GetItemCount(classtable.ManaGem,false, true) or 0
+    ManaGemCharges = C_Item.GetItemCount(5500, true)
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
     --end
-    classtable.MageArmorBuff = 0
-    classtable.MoltenArmorBuff = 0
-    classtable.bloodlust = 0
-    classtable.LivingBombDeBuff = 0
-    classtable.IgniteDeBuff = 0
-    classtable.PyroblastDeBuff = 0
-    classtable.HotStreakBuff = 0
+    classtable.MageArmorBuff = 6117
+    classtable.MoltenArmorBuff = 30482
+    classtable.HotStreakBuff = 48108
+    classtable.LivingBombDeBuff = 44457
+    classtable.IgniteDeBuff = 413841
+    classtable.PyroblastDeBuff = 92315
+    classtable.ArcaneBrilliance = 1459
+    classtable.MoltenArmor = 30482
+    classtable.Counterspell = 2139
+    classtable.ConjureManaGem = 759
+    classtable.VolcanicPotion = 58091
+    classtable.ManaGem = 3
+    classtable.Scorch = 2948
+    classtable.Combustion = 11129
+    classtable.MirrorImage = 55342
+    classtable.LivingBomb = 44457
+    classtable.FlameOrb = 82731
+    classtable.Fireball = 133
+    classtable.MageArmor = 6117
 
     local function debugg()
     end
