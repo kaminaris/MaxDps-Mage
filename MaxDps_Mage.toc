@@ -25,3 +25,9 @@ Specialization/Cata/Arcane.lua
 Specialization/Cata/Frost.lua
 Specialization/Cata/Fire.lua
 #@end-version-cata@
+
+#@version-classic@
+Specialization/Classic/Arcane.lua
+Specialization/Classic/Frost.lua
+Specialization/Classic/Fire.lua
+#@end-version-classic@
