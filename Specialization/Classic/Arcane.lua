@@ -69,26 +69,38 @@ local function ClearCDs()
 end
 
 function Arcane:Single()
-    if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power')) and (debuff[classtable.ArcanePower].count == 5) and cooldown[classtable.ArcanePower].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power')) and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'Presence of Mind')) and (buff[classtable.PresenceofMind].up) and cooldown[classtable.PresenceofMind].ready then
+    if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'Presence of Mind')) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt')) and cooldown[classtable.Frostbolt].ready then
+    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'Fire Blast')) and (talents[classtable.ImprovedArcaneMissiles]) and cooldown[classtable.FireBlast].ready then
+        if not setSpell then setSpell = classtable.FireBlast end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'Arcane Missiles')) and (talents[classtable.ImprovedArcaneMissiles]) and cooldown[classtable.ArcaneMissiles].ready then
+        if not setSpell then setSpell = classtable.ArcaneMissiles end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt')) and (not talents[classtable.ImprovedArcaneMissiles]) and cooldown[classtable.Frostbolt].ready then
         if not setSpell then setSpell = classtable.Frostbolt end
     end
 end
 
 function Arcane:AoE()
-    if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power')) and (debuff[classtable.ArcanePower].count == 5) and cooldown[classtable.ArcanePower].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power'))  and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'Presence of Mind')) and cooldown[classtable.PresenceofMind].ready then
+        if not setSpell then setSpell = classtable.PresenceofMind end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and (MaxDps:FindADAuraData(classtable.Flamestrike).up or MaxDps:FindADAuraData(classtable.Flamestrike).refreshable) and cooldown[classtable.Flamestrike].ready then
+        if not setSpell then setSpell = classtable.Flamestrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ConeofCold, 'ConeofCold')) and (not talents[classtable.ImprovedArcaneMissiles] and ( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ConeofCold].ready then
+        if not setSpell then setSpell = classtable.ConeofCold end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'Arcane Explosion')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ArcaneExplosion].ready then
         if not setSpell then setSpell = classtable.ArcaneExplosion end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.Blizzard, 'Blizzard')) and cooldown[classtable.Blizzard].ready then
-        if not setSpell then setSpell = classtable.Blizzard end
     end
 end
 
@@ -131,6 +143,9 @@ function Mage:Arcane()
     classtable.Frostbolt = 10181
     classtable.ArcaneExplosion = 10202
     classtable.Blizzard = 10187
+    classtable.ImprovedArcaneMissiles = 16770
+    classtable.ConeofCold = 10161
+    classtable.Flamestrike = 10216
 
     local function debugg()
     end

@@ -72,8 +72,14 @@ function Fire:Single()
     if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and cooldown[classtable.Combustion].ready then
         if not setSpell then setSpell = classtable.Combustion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and (debuff[classtable.ImprovedScorch].count == 5 or debuff[classtable.ImprovedScorch].refreshable) and cooldown[classtable.Scorch].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and (MaxDps:FindADAuraData(classtable.ImprovedScorch).count < 5 or debuff[classtable.ImprovedScorch].refreshable) and cooldown[classtable.Scorch].ready then
         if not setSpell then setSpell = classtable.Scorch end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.Pyroblast, 'Pyroblast')) and (not MaxDps:FindADAuraData(classtable.Ignite).up) and cooldown[classtable.Pyroblast].ready then
+        if not setSpell then setSpell = classtable.Pyroblast end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.FireBlast, 'Fire Blast')) and cooldown[classtable.FireBlast].ready then
+        if not setSpell then setSpell = classtable.FireBlast end
     end
     if (MaxDps:CheckSpellUsable(classtable.Fireball, 'Fireball')) and cooldown[classtable.Fireball].ready then
         if not setSpell then setSpell = classtable.Fireball end
@@ -81,8 +87,14 @@ function Fire:Single()
 end
 
 function Fire:AoE()
-    if (MaxDps:CheckSpellUsable(classtable.Blizzard, 'Blizzard')) and cooldown[classtable.Blizzard].ready then
-        if not setSpell then setSpell = classtable.Blizzard end
+    if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and (MaxDps:FindADAuraData(classtable.Flamestrike).up or MaxDps:FindADAuraData(classtable.Flamestrike).refreshable) and cooldown[classtable.Flamestrike].ready then
+        if not setSpell then setSpell = classtable.Flamestrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.BlastWave, 'Blast Wave')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.BlastWave].ready then
+        if not setSpell then setSpell = classtable.BlastWave end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'Arcane Explosion')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ArcaneExplosion].ready then
+        if not setSpell then setSpell = classtable.ArcaneExplosion end
     end
 end
 
@@ -123,8 +135,12 @@ function Mage:Fire()
     classtable.Combustion = 11129
     classtable.Scorch = 10207
     classtable.Fireball = 25306
-    classtable.Blizzard = 10187
     classtable.ImprovedScorch = 12873
+    classtable.Flamestrike = 10216
+    classtable.ArcaneExplosion = 10202
+    classtable.Ignite = 12848
+    classtable.Pyroblast = 12526
+    classtable.FireBlast = 10199
 
 
     local function debugg()

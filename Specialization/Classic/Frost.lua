@@ -75,8 +75,14 @@ function Frost:Single()
 end
 
 function Frost:AoE()
-    if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and cooldown[classtable.Flamestrike].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and (MaxDps:FindADAuraData(classtable.Flamestrike).up or MaxDps:FindADAuraData(classtable.Flamestrike).refreshable) and cooldown[classtable.Flamestrike].ready then
         if not setSpell then setSpell = classtable.Flamestrike end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ConeofCold, 'ConeofCold')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ConeofCold].ready then
+        if not setSpell then setSpell = classtable.ConeofCold end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'Arcane Explosion')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ArcaneExplosion].ready then
+        if not setSpell then setSpell = classtable.ArcaneExplosion end
     end
 end
 
@@ -116,6 +122,8 @@ function Mage:Frost()
 
     classtable.Frostbolt = 10181
     classtable.Flamestrike = 10216
+    classtable.ConeofCold = 10161
+    classtable.ArcaneExplosion = 10202
 
     local function debugg()
     end
