@@ -396,6 +396,7 @@ function Mage:Fire()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
+    classtable.Fireball = talents[classtable.FrostfireBolt] and classtable.FrostfireBolt or 133
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
