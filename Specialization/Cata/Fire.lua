@@ -119,8 +119,8 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and (not debuff[classtable.LivingBombDeBuff].up) and cooldown[classtable.LivingBomb].ready then
         if not setSpell then setSpell = classtable.LivingBomb end
     end
-    if (MaxDps:CheckSpellUsable(classtable.PyroblastHs, 'PyroblastHs')) and (buff[classtable.HotStreakBuff].up) and cooldown[classtable.PyroblastHs].ready then
-        if not setSpell then setSpell = classtable.PyroblastHs end
+    if (MaxDps:CheckSpellUsable(classtable.Pyroblast, 'Pyroblast')) and (buff[classtable.HotStreakBuff].up) and cooldown[classtable.PyroblastHs].ready then
+        if not setSpell then setSpell = classtable.Pyroblast end
     end
     if (MaxDps:CheckSpellUsable(classtable.FlameOrb, 'FlameOrb')) and (ttd >= 12) and cooldown[classtable.FlameOrb].ready then
         if not setSpell then setSpell = classtable.FlameOrb end
@@ -184,6 +184,7 @@ function Mage:Fire()
     classtable.FlameOrb = 82731
     classtable.Fireball = 133
     classtable.MageArmor = 6117
+    classtable.Pyroblast = 11366
 
     local function debugg()
     end
