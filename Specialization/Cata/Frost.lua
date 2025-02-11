@@ -204,6 +204,7 @@ function Mage:Frost()
     classtable.IceLance = 30455
     classtable.Frostbolt = 116
     classtable.FireBlast = 2136
+    classtable.FrostfireOrb = 84726
 
     local function debugg()
     end
