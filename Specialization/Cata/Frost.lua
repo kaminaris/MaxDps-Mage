@@ -94,10 +94,10 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrilliance].up) and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and cooldown[classtable.MoltenArmor].ready then
+    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MoltenArmor].up) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
     if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
@@ -190,7 +190,7 @@ function Mage:Frost()
     classtable.BrainFreezeBuff = 57761
     classtable.ArcaneBrilliance = 1459
     classtable.MoltenArmor = 30482
-    classtable.WaterElemental = 1
+    classtable.WaterElemental = 31687
     classtable.Counterspell = 2139
     classtable.ConjureManaGem = 759
     classtable.VolcanicPotion = 58091

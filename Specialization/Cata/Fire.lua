@@ -83,13 +83,13 @@ local function ClearCDs()
 end
 
 function Fire:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrilliance].up) and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MageArmorBuff].up and not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (ManaPerc >45 and buff[classtable.MageArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
+    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (ManaPerc >45 and not buff[classtable.MoltenArmorBuff].up and buff[classtable.MageArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
     if (MaxDps:CheckSpellUsable(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
