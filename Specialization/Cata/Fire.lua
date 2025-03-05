@@ -107,10 +107,10 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaDeficit >12500) and cooldown[classtable.ManaGem].ready then
         if not setSpell then setSpell = classtable.ManaGem end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and cooldown[classtable.Scorch].ready then
-        if not setSpell then setSpell = classtable.Scorch end
-    end
-    if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (debuff[classtable.LivingBombDeBuff].up and debuff[classtable.IgniteDeBuff].up and debuff[classtable.PyroblastDeBuff].up and debuff[classtable.IgniteDeBuff].value >10000) and cooldown[classtable.Combustion].ready then
+    --if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and cooldown[classtable.Scorch].ready then
+    --    if not setSpell then setSpell = classtable.Scorch end
+    --end
+    if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (debuff[classtable.LivingBombDeBuff].up and debuff[classtable.IgniteDeBuff].up and debuff[classtable.PyroblastDeBuff].up ) and cooldown[classtable.Combustion].ready then
         if not setSpell then setSpell = classtable.Combustion end
     end
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and (ttd >= 25) and cooldown[classtable.MirrorImage].ready then
@@ -160,7 +160,7 @@ function Mage:Fire()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    ManaGemCharges = C_Item.GetItemCount(5500, true)
+    ManaGemCharges = C_Item.GetItemCount("Mana Gem", true, true)
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
