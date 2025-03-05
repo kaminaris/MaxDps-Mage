@@ -110,7 +110,7 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.Scorch, 'Scorch')) and cooldown[classtable.Scorch].ready then
         if not setSpell then setSpell = classtable.Scorch end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (debuff[classtable.LivingBombDeBuff].up and debuff[classtable.IgniteDeBuff].up and debuff[classtable.PyroblastDeBuff].up and debuff[classtable.IgniteDeBuff].tick_dmg >10000) and cooldown[classtable.Combustion].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (debuff[classtable.LivingBombDeBuff].up and debuff[classtable.IgniteDeBuff].up and debuff[classtable.PyroblastDeBuff].up and debuff[classtable.IgniteDeBuff].value >10000) and cooldown[classtable.Combustion].ready then
         if not setSpell then setSpell = classtable.Combustion end
     end
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and (ttd >= 25) and cooldown[classtable.MirrorImage].ready then
