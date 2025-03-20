@@ -160,7 +160,7 @@ function Mage:Fire()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    ManaGemCharges = C_Item.GetItemCount("Mana Gem", true, true)
+    ManaGemCharges = C_Item.GetItemCount(36799, true, true)
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
