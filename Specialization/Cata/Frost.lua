@@ -100,7 +100,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MoltenArmor].up) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
-    if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and cooldown[classtable.WaterElemental].ready then
+    if (MaxDps:CheckSpellUsable(classtable.WaterElemental, 'WaterElemental')) and not UnitExists("pet") and cooldown[classtable.WaterElemental].ready then
         if not setSpell then setSpell = classtable.WaterElemental end
     end
     if (MaxDps:CheckSpellUsable(classtable.Counterspell, 'Counterspell')) and cooldown[classtable.Counterspell].ready then
