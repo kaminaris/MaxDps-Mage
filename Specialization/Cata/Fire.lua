@@ -83,7 +83,7 @@ local function ClearCDs()
 end
 
 function Fire:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MageArmorBuff].up and not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready then
@@ -173,6 +173,7 @@ function Mage:Fire()
     classtable.PyroblastDeBuff = 92315
     classtable.ArcaneBrilliance = 1459
     classtable.ArcaneBrillianceBuff = 79058
+    classtable.DalaranBrillianceBuff = 79038
     classtable.MoltenArmor = 30482
     classtable.Counterspell = 2139
     classtable.ConjureManaGem = 759

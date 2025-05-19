@@ -86,7 +86,7 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.FocusMagic, 'FocusMagic')) and (not buff[classtable.FocusMagic].up) and cooldown[classtable.FocusMagic].ready then
         if not setSpell then setSpell = classtable.FocusMagic end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
     if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and (not buff[classtable.MageArmor].up) and cooldown[classtable.MageArmor].ready then
@@ -199,6 +199,7 @@ function Mage:Arcane()
     classtable.FocusMagic = 54646
     classtable.ArcaneBrilliance = 1459
     classtable.ArcaneBrillianceBuff = 79058
+    classtable.DalaranBrillianceBuff = 79038
     classtable.MageArmor = 6117
     classtable.Counterspell = 2139
     classtable.ConjureManaGem = 759
