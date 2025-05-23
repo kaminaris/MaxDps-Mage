@@ -87,7 +87,7 @@ function Arcane:callaction()
         if not setSpell then setSpell = classtable.FocusMagic end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
-        if not setSpell then setSpell = classtable.ArcaneBrilliance end
+        if not setSpell then setSpell = ( (MaxDps:FindSpell(classtable.ArcaneBrilliance) and classtable.ArcaneBrilliance) or (MaxDps:FindSpell(classtable.DalaranBrilliance) and classtable.DalaranBrilliance) or classtable.DalaranBrilliance ) end
     end
     if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and (not buff[classtable.MageArmor].up) and cooldown[classtable.MageArmor].ready then
         if not setSpell then setSpell = classtable.MageArmor end
