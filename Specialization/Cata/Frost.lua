@@ -94,8 +94,8 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready then
-        if not setSpell then setSpell = ( (MaxDps:FindSpell(classtable.ArcaneBrilliance) and classtable.ArcaneBrilliance) or (MaxDps:FindSpell(classtable.DalaranBrilliance) and classtable.DalaranBrilliance) or classtable.DalaranBrilliance ) end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance') or MaxDps:CheckSpellUsable(classtable.DalaranBrilliance, 'DalaranBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and (cooldown[classtable.ArcaneBrilliance].ready or cooldown[classtable.DalaranBrilliance].ready) then
+        if not setSpell then setSpell = ( (MaxDps:FindSpell(classtable.ArcaneBrilliance) and classtable.ArcaneBrilliance) or (MaxDps:FindSpell(classtable.DalaranBrilliance) and classtable.DalaranBrilliance) or classtable.ArcaneBrilliance ) end
     end
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MoltenArmor].up) and cooldown[classtable.MoltenArmor].ready then
         if not setSpell then setSpell = classtable.MoltenArmor end
@@ -190,6 +190,7 @@ function Mage:Frost()
     classtable.BrainFreezeBuff = 57761
     classtable.ArcaneBrilliance = 1459
     classtable.ArcaneBrillianceBuff = 79058
+    classtable.DalaranBrilliance = 61316
     classtable.DalaranBrillianceBuff = 79038
     classtable.MoltenArmor = 30482
     classtable.WaterElemental = 31687
