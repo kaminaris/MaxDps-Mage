@@ -199,6 +199,7 @@ function Mage:Arcane()
     classtable.FocusMagic = 54646
     classtable.ArcaneBrilliance = 1459
     classtable.ArcaneBrillianceBuff = 79058
+    classtable.DalaranBrilliance = 61316
     classtable.DalaranBrillianceBuff = 79038
     classtable.MageArmor = 6117
     classtable.Counterspell = 2139

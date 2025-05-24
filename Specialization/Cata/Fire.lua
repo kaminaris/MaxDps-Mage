@@ -173,6 +173,7 @@ function Mage:Fire()
     classtable.PyroblastDeBuff = 92315
     classtable.ArcaneBrilliance = 1459
     classtable.ArcaneBrillianceBuff = 79058
+    classtable.DalaranBrilliance = 61316
     classtable.DalaranBrillianceBuff = 79038
     classtable.MoltenArmor = 30482
     classtable.Counterspell = 2139
