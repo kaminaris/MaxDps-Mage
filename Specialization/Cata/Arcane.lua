@@ -83,9 +83,9 @@ local function ClearCDs()
 end
 
 function Arcane:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.FocusMagic, 'FocusMagic')) and (not buff[classtable.FocusMagic].up) and cooldown[classtable.FocusMagic].ready then
-        if not setSpell then setSpell = classtable.FocusMagic end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.FocusMagic, 'FocusMagic')) and (not buff[classtable.FocusMagic].up) and cooldown[classtable.FocusMagic].ready then
+    --    if not setSpell then setSpell = classtable.FocusMagic end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance') or MaxDps:CheckSpellUsable(classtable.DalaranBrilliance, 'DalaranBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and (cooldown[classtable.ArcaneBrilliance].ready or cooldown[classtable.DalaranBrilliance].ready) then
         if not setSpell then setSpell = ( (MaxDps:FindSpell(classtable.ArcaneBrilliance) and classtable.ArcaneBrilliance) or (MaxDps:FindSpell(classtable.DalaranBrilliance) and classtable.DalaranBrilliance) or classtable.ArcaneBrilliance ) end
     end
