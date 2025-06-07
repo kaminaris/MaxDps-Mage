@@ -104,7 +104,7 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (buff[classtable.ImprovedManaGemBuff].up or ttd <= 50) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <= 35) and cooldown[classtable.Evocation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <= 40) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
     if (MaxDps:CheckSpellUsable(classtable.FlameOrb, 'FlameOrb')) and (ttd >= 10) and cooldown[classtable.FlameOrb].ready then
@@ -122,7 +122,7 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (buff[classtable.PresenceofMindBuff].up and ttd >not cooldown[classtable.ManaGem].ready and ManaGemCharges == 0) and cooldown[classtable.ConjureManaGem].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (buff[classtable.PresenceofMindBuff].up and ttd > cooldown[classtable.ManaGem].remains and ManaGemCharges == 0) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.PresenceofMindBuff].up) and cooldown[classtable.ArcaneBlast].ready then
