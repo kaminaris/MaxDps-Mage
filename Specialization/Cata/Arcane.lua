@@ -104,7 +104,7 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (buff[classtable.ImprovedManaGemBuff].up or ttd <= 50) and cooldown[classtable.VolcanicPotion].ready then
         if not setSpell then setSpell = classtable.VolcanicPotion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (( ( ManaMax >ManaMax and ManaPerc <= 40 ) or ( ManaMax == ManaMax and ManaPerc <= 35 ) ) and ttd >10) and cooldown[classtable.Evocation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <= 35) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
     if (MaxDps:CheckSpellUsable(classtable.FlameOrb, 'FlameOrb')) and (ttd >= 10) and cooldown[classtable.FlameOrb].ready then
