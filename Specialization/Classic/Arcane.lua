@@ -69,6 +69,9 @@ local function ClearCDs()
 end
 
 function Arcane:Single()
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <= 35) and cooldown[classtable.Evocation].ready then
+        if not setSpell then setSpell = classtable.Evocation end
+    end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power')) and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
     end
@@ -87,6 +90,9 @@ function Arcane:Single()
 end
 
 function Arcane:AoE()
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <= 35) and cooldown[classtable.Evocation].ready then
+        if not setSpell then setSpell = classtable.Evocation end
+    end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'Arcane Power'))  and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
     end
@@ -146,6 +152,7 @@ function Mage:Arcane()
     classtable.ImprovedArcaneMissiles = 16770
     classtable.ConeofCold = 10161
     classtable.Flamestrike = 10216
+    classtable.Evocation = 12051
 
     local function debugg()
     end
