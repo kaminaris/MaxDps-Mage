@@ -31,3 +31,9 @@ Specialization/Classic/Arcane.lua
 Specialization/Classic/Frost.lua
 Specialization/Classic/Fire.lua
 #@end-version-classic@
+
+#@version-mists@
+Specialization/Mop/Arcane.lua
+Specialization/Mop/Frost.lua
+Specialization/Mop/Fire.lua
+#@end-version-mists@
