@@ -64,30 +64,38 @@ local Mana
 local ManaMax
 local ManaDeficit
 local ManaPerc
+local ManaGemCharges
 
 local Arcane = {}
 
 
 
-local function freezable()
-   if (cooldown[classtable.IceNova].ready or cooldown[classtable.Freeze].ready or cooldown[classtable.FrostNova].ready) and not ( UnitName('target') == UnitName('boss1') or UnitName('target') == UnitName('boss2') or UnitName('target') == UnitName('boss3') or UnitName('target') == UnitName('boss4') or UnitName('target') == UnitName('boss5') or UnitName('target') == UnitName('boss6') or UnitName('target') == UnitName('boss7') or UnitName('target') == UnitName('boss8') ) then
-      return true
-    else
-      return false
-   end
+local function HasDebuff(debuffName)
+    local i = 1
+    while true do
+        local name, _, count = UnitDebuff("player", i)
+        if not name then
+            break -- No more debuffs
+        end
+        if name == debuffName then
+            return true, count -- Found the debuff
+        end
+        i = i + 1
+    end
+    return false,0 -- Debuff not found
 end
 
 
 function Arcane:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and cooldown[classtable.MageArmor].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.MageArmor, 'MageArmor')) and (not buff[classtable.MageArmorBuff].up) and cooldown[classtable.MageArmor].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.MageArmor end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and cooldown[classtable.VolcanicPotion].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.VolcanicPotion end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and cooldown[classtable.VolcanicPotion].ready and not UnitAffectingCombat('player') then
+    --    if not setSpell then setSpell = classtable.VolcanicPotion end
+    --end
 end
 
 
@@ -97,12 +105,12 @@ local function ClearCDs()
 end
 
 function Arcane:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <3 and target.debuff.invulnerable.up) and cooldown[classtable.ConjureManaGem].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <=1) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
-    if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
-        if not setSpell then setSpell = classtable.TimeWarp end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
+    --    if not setSpell then setSpell = classtable.TimeWarp end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'ArcanePower')) and (ttd <18) and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
     end
@@ -112,9 +120,9 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.AlterTimeBuff].up or buff[classtable.ArcaneMissilesBuff].count == 2) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (buff[classtable.ArcanePowerBuff].up or ttd <= 50) and cooldown[classtable.VolcanicPotion].ready then
-        if not setSpell then setSpell = classtable.VolcanicPotion end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (buff[classtable.ArcanePowerBuff].up or ttd <= 50) and cooldown[classtable.VolcanicPotion].ready then
+    --    if not setSpell then setSpell = classtable.VolcanicPotion end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaPerc <84 and not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.ManaGem].ready then
         if not setSpell then setSpell = classtable.ManaGem end
     end
@@ -130,13 +138,13 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and (not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and (not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
+    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and talents[classtable.NetherTempest] and (not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
         if not setSpell then setSpell = classtable.NetherTempest end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.ArcaneMissilesBuff].up and ( cooldown[classtable.AlterTimeActivate].remains >4 or ttd <10 )) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (buff[classtable.ArcaneChargeBuff].up and not buff[classtable.ArcanePowerBuff].up and not buff[classtable.AlterTimeBuff].up and ( ManaPerc <92 or cooldown[classtable.ManaGem].remains >10 or ManaGemCharges == 0 )) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (HasDebuff("Arcane Charge") and select(2,HasDebuff("Arcane Charge")) >= 4 and not buff[classtable.ArcanePowerBuff].up and not buff[classtable.AlterTimeBuff].up and ( ManaPerc <92 or cooldown[classtable.ManaGem].remains >10 or ManaGemCharges == 0 )) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and cooldown[classtable.ArcaneBlast].ready then
@@ -177,6 +185,19 @@ function Mage:Arcane()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
+    ManaGemCharges = C_Item.GetItemCount(36799, true, true)
+
+    classtable.ManaGem = 5405
+
+    classtable.ArcaneBrillianceBuff = 1459
+    classtable.MageArmorBuff = 6117
+    classtable.AlterTimeBuff = 110909
+    classtable.PresenceofMindBuff = 12043
+    classtable.ArcaneMissilesBuff = 79683
+    classtable.ArcaneChargeDeBuff = 36032
+    classtable.ArcanePowerBuff = 12042
+    classtable.NetherTempestDeBuff= 114923
+
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)

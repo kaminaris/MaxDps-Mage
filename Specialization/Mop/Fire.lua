@@ -64,6 +64,7 @@ local Mana
 local ManaMax
 local ManaDeficit
 local ManaPerc
+local ManaGemCharges
 
 local Fire = {}
 
@@ -79,15 +80,15 @@ end
 
 
 function Fire:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.ArcaneBrilliance end
     end
-    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and cooldown[classtable.MoltenArmor].ready and not UnitAffectingCombat('player') then
+    if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and cooldown[classtable.VolcanicPotion].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.VolcanicPotion end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and cooldown[classtable.VolcanicPotion].ready and not UnitAffectingCombat('player') then
+    --    if not setSpell then setSpell = classtable.VolcanicPotion end
+    --end
 end
 
 
@@ -97,12 +98,12 @@ local function ClearCDs()
 end
 
 function Fire:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <3 and target.debuff.invulnerable.up) and cooldown[classtable.ConjureManaGem].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <=1) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
-    if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
-        if not setSpell then setSpell = classtable.TimeWarp end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
+    --    if not setSpell then setSpell = classtable.TimeWarp end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (ttd <12) and cooldown[classtable.Combustion].ready then
         if not setSpell then setSpell = classtable.Combustion end
     end
@@ -112,9 +113,9 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.Combustion, 'Combustion')) and (not (MaxDps.tier and MaxDps.tier[14].count >= 4) and debuff[classtable.IgniteDeBuff].value >= 12000 and debuff[classtable.PyroblastDeBuff].up) and cooldown[classtable.Combustion].ready then
         if not setSpell then setSpell = classtable.Combustion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust(1) or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
-        if not setSpell then setSpell = classtable.VolcanicPotion end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.VolcanicPotion, 'VolcanicPotion')) and (MaxDps:Bloodlust(1) or ttd <= 40) and cooldown[classtable.VolcanicPotion].ready then
+    --    if not setSpell then setSpell = classtable.VolcanicPotion end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaPerc <84 and not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.ManaGem].ready then
         if not setSpell then setSpell = classtable.ManaGem end
     end
@@ -133,7 +134,7 @@ function Fire:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and (not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and (not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
+    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and talents[classtable.NetherTempest] and (not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
         if not setSpell then setSpell = classtable.NetherTempest end
     end
     if (MaxDps:CheckSpellUsable(classtable.Fireball, 'Fireball')) and cooldown[classtable.Fireball].ready then
@@ -171,7 +172,11 @@ function Mage:Fire()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    classtable.Fireball = talents[classtable.FrostfireBolt] and classtable.FrostfireBolt or 133
+    ManaGemCharges = C_Item.GetItemCount(36799, true, true)
+
+    classtable.ManaGem = 5405
+    classtable.InfernoBlast = 108853
+
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
     --    self:ClearGlowIndependent(spellId, spellId)
@@ -180,6 +185,14 @@ function Mage:Fire()
     local function debugg()
     end
 
+    classtable.ArcaneBrillianceBuff = 1459
+    classtable.MoltenArmorBuff = 30482
+    classtable.AlterTimeBuff = 110909
+    classtable.PyroblastBuff = 48108
+    classtable.HeatingUpBuff = 48107
+    classtable.IgniteDeBuff = 413841
+    classtable.PyroblastDeBuff = 11366
+    classtable.NetherTempestDeBuff = 114923
 
     --if MaxDps.db.global.debugMode then
     --   debugg()
