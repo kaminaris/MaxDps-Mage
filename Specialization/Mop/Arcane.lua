@@ -138,8 +138,11 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and (not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
-    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and talents[classtable.NetherTempest] and (not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
+    if (MaxDps:CheckSpellUsable(classtable.NetherTempest, 'NetherTempest')) and talents[classtable.NetherTempest] and (targets >= 5 and not debuff[classtable.NetherTempestDeBuff].up) and cooldown[classtable.NetherTempest].ready then
         if not setSpell then setSpell = classtable.NetherTempest end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and talents[classtable.LivingBomb] and (targets <= 4 and not debuff[classtable.LivingBombDeBuff].up) and cooldown[classtable.LivingBomb].ready then
+        if not setSpell then setSpell = classtable.LivingBomb end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.ArcaneMissilesBuff].up and ( cooldown[classtable.AlterTimeActivate].remains >4 or ttd <10 )) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
@@ -197,6 +200,7 @@ function Mage:Arcane()
     classtable.ArcaneChargeDeBuff = 36032
     classtable.ArcanePowerBuff = 12042
     classtable.NetherTempestDeBuff= 114923
+    classtable.LivingBombDeBuff = 44457
 
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
