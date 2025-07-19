@@ -197,6 +197,8 @@ function Mage:Frost()
     classtable.ManaGem = 759
 
     classtable.ArcaneBrillianceBuff = 1459
+    classtable.DalaranBrilliance = 61316
+    classtable.DalaranBrillianceBuff = 79038
     classtable.FrostArmorBuff = 7302
     classtable.AlterTimeBuff = 110909
     classtable.FingersofFrostBuff = 44544

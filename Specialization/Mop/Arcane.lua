@@ -196,6 +196,8 @@ function Mage:Arcane()
     classtable.ManaGem = 5405
 
     classtable.ArcaneBrillianceBuff = 1459
+    classtable.DalaranBrilliance = 61316
+    classtable.DalaranBrillianceBuff = 79038
     classtable.MageArmorBuff = 6117
     classtable.AlterTimeBuff = 110909
     classtable.PresenceofMindBuff = 12043
