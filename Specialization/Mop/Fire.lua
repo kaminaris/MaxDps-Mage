@@ -80,9 +80,12 @@ end
 
 
 function Fire:precombat()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
-        if not setSpell then setSpell = classtable.ArcaneBrilliance end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance') or MaxDps:CheckSpellUsable(classtable.DalaranBrilliance, 'DalaranBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up and not buff[classtable.DalaranBrillianceBuff].up) and (cooldown[classtable.ArcaneBrilliance].ready or cooldown[classtable.DalaranBrilliance].ready) and not UnitAffectingCombat('player') then
+        if not setSpell then setSpell = ( (MaxDps:FindSpell(classtable.ArcaneBrilliance) and classtable.ArcaneBrilliance) or (MaxDps:FindSpell(classtable.DalaranBrilliance) and classtable.DalaranBrilliance) or classtable.ArcaneBrilliance ) end
     end
+    --if (MaxDps:CheckSpellUsable(classtable.ArcaneBrilliance, 'ArcaneBrilliance')) and (not buff[classtable.ArcaneBrillianceBuff].up) and cooldown[classtable.ArcaneBrilliance].ready and not UnitAffectingCombat('player') then
+    --    if not setSpell then setSpell = classtable.ArcaneBrilliance end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.MoltenArmor, 'MoltenArmor')) and (not buff[classtable.MoltenArmorBuff].up) and cooldown[classtable.MoltenArmor].ready and not UnitAffectingCombat('player') then
         if not setSpell then setSpell = classtable.MoltenArmor end
     end
