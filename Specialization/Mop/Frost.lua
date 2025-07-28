@@ -102,6 +102,7 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.Counterspell, false)
     MaxDps:GlowCooldown(classtable.IcyVeins, false)
     MaxDps:GlowCooldown(classtable.MirrorImage, false)
+    MaxDps:GlowCooldown(classtable.WaterElementalfreeze, false)
 end
 
 function Frost:callaction()
@@ -118,7 +119,8 @@ function Frost:callaction()
         if not setSpell then setSpell = classtable.PresenceofMind end
     end
     if (MaxDps:CheckSpellUsable(classtable.WaterElementalfreeze, 'WaterElementalfreeze')) and (not buff[classtable.AlterTimeBuff].up and buff[classtable.FingersofFrostBuff].count <2) and cooldown[classtable.WaterElementalfreeze].ready then
-        if not setSpell then setSpell = classtable.WaterElementalfreeze end
+        --if not setSpell then setSpell = classtable.WaterElementalfreeze end
+        MaxDps:GlowCooldown(classtable.WaterElementalfreeze, cooldown[classtable.WaterElementalfreeze].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and (ttd <22) and cooldown[classtable.IcyVeins].ready then
         MaxDps:GlowCooldown(classtable.IcyVeins, cooldown[classtable.IcyVeins].ready)
