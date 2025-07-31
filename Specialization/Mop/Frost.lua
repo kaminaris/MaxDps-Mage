@@ -108,7 +108,7 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and cooldown[classtable.LivingBomb].ready then
+    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and (debuff[classtable.LivingBombDeBuff].refreshable) and cooldown[classtable.LivingBomb].ready then
         if not setSpell then setSpell = classtable.LivingBomb end
     end
     if (MaxDps:CheckSpellUsable(classtable.ColdSnap, 'ColdSnap')) and (healthPerc <30) and cooldown[classtable.ColdSnap].ready then
@@ -216,6 +216,7 @@ function Mage:Frost()
     classtable.FrostBombDeBuff = 61573
     classtable.FrozenOrbDeBuff = 84721
     classtable.FrostboltDeBuff = 116
+    classtable.LivingBombDeBuff = 44457
 
     --for spellId in pairs(MaxDps.Flags) do
     --    self.Flags[spellId] = false
