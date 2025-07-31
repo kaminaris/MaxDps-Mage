@@ -103,14 +103,20 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.IcyVeins, false)
     MaxDps:GlowCooldown(classtable.MirrorImage, false)
     MaxDps:GlowCooldown(classtable.WaterElementalfreeze, false)
+    MaxDps:GlowCooldown(classtable.ConjureManaGem, false)
+    MaxDps:GlowCooldown(classtable.ManaGem, false)
 end
 
 function Frost:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and cooldown[classtable.LivingBomb].ready then
+        if not setSpell then setSpell = classtable.LivingBomb end
+    end
     if (MaxDps:CheckSpellUsable(classtable.ColdSnap, 'ColdSnap')) and (healthPerc <30) and cooldown[classtable.ColdSnap].ready then
         if not setSpell then setSpell = classtable.ColdSnap end
     end
     if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <=1) and cooldown[classtable.ConjureManaGem].ready then
-        if not setSpell then setSpell = classtable.ConjureManaGem end
+        --if not setSpell then setSpell = classtable.ConjureManaGem end
+        MaxDps:GlowCooldown(classtable.ConjureManaGem, true)
     end
     --if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
     --    if not setSpell then setSpell = classtable.TimeWarp end
@@ -153,7 +159,8 @@ function Frost:callaction()
         if not setSpell then setSpell = classtable.FrozenOrb end
     end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaPerc <84 and not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.ManaGem].ready then
-        if not setSpell then setSpell = classtable.ManaGem end
+        --if not setSpell then setSpell = classtable.ManaGem end
+        MaxDps:GlowCooldown(classtable.ManaGem, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <10 and ttd >= 30) and cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
@@ -231,3 +238,31 @@ function Mage:Frost()
     Frost:callaction()
     if setSpell then return setSpell end
 end
+
+Mage.playerUnitFrame = CreateFrame('Frame')
+Mage.playerUnitFrame:RegisterUnitEvent('UNIT_SPELLCAST_SUCCEEDED', 'player')
+Mage.playerUnitFrame:SetScript('OnEvent', function(_, _, _, _, spellId)
+    ---- event, unit, lineId
+    --if not spellHistoryBlacklist[spellId] and IsPlayerSpell(spellId) then
+    --    TableInsert(self.spellHistory, 1, spellId)
+    --    if MaxDps:IsRetailWow() then
+    --        if not self.spellHistoryTime[FormatItemorSpell(C_Spell.GetSpellName(spellId))] then
+    --            self.spellHistoryTime[FormatItemorSpell(C_Spell.GetSpellName(spellId))] = {}
+    --        end
+    --        self.spellHistoryTime[FormatItemorSpell(C_Spell.GetSpellName(spellId))].last_used = GetTime()
+--
+    --        if #self.spellHistory > 5 then
+    --            TableRemove(self.spellHistory)
+    --        end
+    --    else
+    --        if not self.spellHistoryTime[FormatItemorSpell(GetSpellInfo(spellId))] then
+    --            self.spellHistoryTime[FormatItemorSpell(GetSpellInfo(spellId))] = {}
+    --        end
+    --        self.spellHistoryTime[FormatItemorSpell(GetSpellInfo(spellId))].last_used = GetTime()
+--
+    --        if #self.spellHistory > 5 then
+    --            TableRemove(self.spellHistory)
+    --        end
+    --    end
+    --end
+end)
