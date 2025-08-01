@@ -105,9 +105,14 @@ end
 local function ClearCDs()
     MaxDps:GlowCooldown(classtable.Counterspell, false)
     MaxDps:GlowCooldown(classtable.MirrorImage, false)
+    MaxDps:GlowCooldown(classtable.AlterTime, false)
 end
 
 function Arcane:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.AlterTime, 'AlterTime')) and (HasDebuff("Arcane Charge") and select(2,HasDebuff("Arcane Charge")) >= 4) and cooldown[classtable.AlterTime].ready then
+        --if not setSpell then setSpell = classtable.AlterTime end
+        MaxDps:GlowCooldown(classtable.AlterTime, cooldown[classtable.AlterTime].ready)
+    end
     if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <=1) and cooldown[classtable.ConjureManaGem].ready then
         if not setSpell then setSpell = classtable.ConjureManaGem end
     end
@@ -132,8 +137,16 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
         MaxDps:GlowCooldown(classtable.MirrorImage, cooldown[classtable.MirrorImage].ready)
     end
-    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and (ManaPerc <30 and ttd >= 15) and cooldown[classtable.Evocation].ready then
+    if (MaxDps:CheckSpellUsable(classtable.Evocation, 'Evocation')) and
+    (not talents[classtable.Invocation] and not talents[classtable.RuneofPower] and ManaPerc <30 and ttd >= 15) or
+    (talents[classtable.Invocation] and buff[classtable.InvokersEnergyBuff].refreshable) and
+    cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.RuneofPower, 'RuneofPower')) and
+    (talents[classtable.RuneofPower] and buff[classtable.RuneofPower].refreshable) and
+    cooldown[classtable.RuneofPower].ready then
+        if not setSpell then setSpell = classtable.RuneofPower end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'ArcanePower')) and (not buff[classtable.AlterTimeBuff].up and ArcaneCharges >2) and cooldown[classtable.ArcanePower].ready then
         if not setSpell then setSpell = classtable.ArcanePower end
@@ -151,6 +164,9 @@ function Arcane:callaction()
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (HasDebuff("Arcane Charge") and select(2,HasDebuff("Arcane Charge")) >= 4 and not buff[classtable.ArcanePowerBuff].up and not buff[classtable.AlterTimeBuff].up and ( ManaPerc <92 or cooldown[classtable.ManaGem].remains >10 or ManaGemCharges == 0 )) and cooldown[classtable.ArcaneBarrage].ready then
+        if not setSpell then setSpell = classtable.ArcaneBarrage end
+    end
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (HasDebuff("Arcane Charge") and select(2,HasDebuff("Arcane Charge")) >= 4 and not buff[classtable.ArcaneMissilesBuff].up and buff[classtable.ProfoundMagicBuff].count <2) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and cooldown[classtable.ArcaneBlast].ready then
@@ -202,6 +218,8 @@ function Mage:Arcane()
     classtable.AlterTimeBuff = 110909
     classtable.PresenceofMindBuff = 12043
     classtable.ArcaneMissilesBuff = 79683
+    classtable.InvokersEnergyBuff = 116257
+    classtable.ProfoundMagicBuff = 145252
     classtable.ArcaneChargeDeBuff = 36032
     classtable.ArcanePowerBuff = 12042
     classtable.NetherTempestDeBuff= 114923
