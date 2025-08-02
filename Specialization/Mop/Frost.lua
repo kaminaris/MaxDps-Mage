@@ -108,7 +108,7 @@ local function ClearCDs()
 end
 
 function Frost:callaction()
-    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and (debuff[classtable.LivingBombDeBuff].refreshable) and cooldown[classtable.LivingBomb].ready then
+    if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and talents[classtable.LivingBomb] and (debuff[classtable.LivingBombDeBuff].refreshable) and cooldown[classtable.LivingBomb].ready then
         if not setSpell then setSpell = classtable.LivingBomb end
     end
     if (MaxDps:CheckSpellUsable(classtable.ColdSnap, 'ColdSnap')) and (healthPerc <30) and cooldown[classtable.ColdSnap].ready then
