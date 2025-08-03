@@ -105,9 +105,13 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.WaterElementalfreeze, false)
     MaxDps:GlowCooldown(classtable.ConjureManaGem, false)
     MaxDps:GlowCooldown(classtable.ManaGem, false)
+    MaxDps:GlowCooldown(classtable.AlterTime, false)
 end
 
 function Frost:callaction()
+    if (MaxDps:CheckSpellUsable(classtable.AlterTime, 'AlterTime')) and (buff[classtable.BrainFreezeBuff].up) and cooldown[classtable.AlterTime].ready then
+        MaxDps:GlowCooldown(classtable.AlterTime, true)
+    end
     if (MaxDps:CheckSpellUsable(classtable.LivingBomb, 'LivingBomb')) and talents[classtable.LivingBomb] and (debuff[classtable.LivingBombDeBuff].refreshable) and cooldown[classtable.LivingBomb].ready then
         if not setSpell then setSpell = classtable.LivingBomb end
     end
@@ -134,7 +138,7 @@ function Frost:callaction()
     if (MaxDps:CheckSpellUsable(classtable.FrostBomb, 'FrostBomb')) and talents[classtable.FrostBomb] and (not debuff[classtable.FrostBombDeBuff].up) and cooldown[classtable.FrostBomb].ready then
         if not setSpell then setSpell = classtable.FrostBomb end
     end
-    if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and (debuff[classtable.FrozenOrbDeBuff].up and not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.IcyVeins].ready then
+    if (MaxDps:CheckSpellUsable(classtable.IcyVeins, 'IcyVeins')) and (not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.IcyVeins].ready then
         MaxDps:GlowCooldown(classtable.IcyVeins, cooldown[classtable.IcyVeins].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
