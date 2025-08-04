@@ -106,6 +106,8 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.Counterspell, false)
     MaxDps:GlowCooldown(classtable.MirrorImage, false)
     MaxDps:GlowCooldown(classtable.AlterTime, false)
+    MaxDps:GlowCooldown(classtable.ConjureManaGem, false)
+    MaxDps:GlowCooldown(classtable.ManaGem, false)
 end
 
 function Arcane:callaction()
@@ -114,7 +116,8 @@ function Arcane:callaction()
         MaxDps:GlowCooldown(classtable.AlterTime, cooldown[classtable.AlterTime].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.ConjureManaGem, 'ConjureManaGem')) and (ManaGemCharges <=1) and cooldown[classtable.ConjureManaGem].ready then
-        if not setSpell then setSpell = classtable.ConjureManaGem end
+        --if not setSpell then setSpell = classtable.ConjureManaGem end
+        MaxDps:GlowCooldown(classtable.ConjureManaGem, cooldown[classtable.ConjureManaGem].ready)
     end
     --if (MaxDps:CheckSpellUsable(classtable.TimeWarp, 'TimeWarp')) and (targethealthPerc <25 or timeInCombat >5) and cooldown[classtable.TimeWarp].ready then
     --    if not setSpell then setSpell = classtable.TimeWarp end
@@ -132,7 +135,8 @@ function Arcane:callaction()
     --    if not setSpell then setSpell = classtable.VolcanicPotion end
     --end
     if (MaxDps:CheckSpellUsable(classtable.ManaGem, 'ManaGem')) and (ManaPerc <84 and not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.ManaGem].ready then
-        if not setSpell then setSpell = classtable.ManaGem end
+        --if not setSpell then setSpell = classtable.ManaGem end
+        MaxDps:GlowCooldown(classtable.ManaGem, cooldown[classtable.ManaGem].ready)
     end
     if (MaxDps:CheckSpellUsable(classtable.MirrorImage, 'MirrorImage')) and cooldown[classtable.MirrorImage].ready then
         MaxDps:GlowCooldown(classtable.MirrorImage, cooldown[classtable.MirrorImage].ready)
@@ -143,8 +147,8 @@ function Arcane:callaction()
     cooldown[classtable.Evocation].ready then
         if not setSpell then setSpell = classtable.Evocation end
     end
-    if (MaxDps:CheckSpellUsable(classtable.RuneofPower, 'RuneofPower')) and
-    (talents[classtable.RuneofPower] and buff[classtable.RuneofPower].refreshable) and
+    if (MaxDps:CheckSpellUsable(classtable.RuneofPower, 'RuneofPower')) and --MaxDps:FindBuffAuraData(spellID)
+    (talents[classtable.RuneofPower] and buff[classtable.RuneofPowerBuff].refreshable) and
     cooldown[classtable.RuneofPower].ready then
         if not setSpell then setSpell = classtable.RuneofPower end
     end
@@ -207,9 +211,9 @@ function Mage:Arcane()
     SpellCrit = GetCritChance()
     ArcaneCharges = UnitPower('player', ArcaneChargesPT)
     ManaPerc = (Mana / ManaMax) * 100
-    ManaGemCharges = C_Item.GetItemCount(36799, true, true)
+    ManaGemCharges = (MaxDps:HasGlyphEnabled(56383) and C_Item.GetItemCount(81901, true, true)) or C_Item.GetItemCount(36799, true, true)
 
-    classtable.ManaGem = 5405
+    classtable.ManaGem = (MaxDps:HasGlyphEnabled(56383) and 81901) or 5405
 
     classtable.ArcaneBrillianceBuff = 1459
     classtable.DalaranBrilliance = 61316
@@ -222,6 +226,7 @@ function Mage:Arcane()
     classtable.ProfoundMagicBuff = 145252
     classtable.ArcaneChargeDeBuff = 36032
     classtable.ArcanePowerBuff = 12042
+    classtable.RuneofPowerBuff = 116014
     classtable.NetherTempestDeBuff= 114923
     classtable.LivingBombDeBuff = 44457
 
