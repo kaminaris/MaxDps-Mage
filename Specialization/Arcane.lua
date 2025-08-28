@@ -194,7 +194,7 @@ function Arcane:spellslinger()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneMissiles, 'ArcaneMissiles')) and (buff[classtable.AetherAttunementBuff].up and cooldown[classtable.TouchoftheMagi].remains <gcd*3 and buff[classtable.ClearcastingBuff].up and (MaxDps.tier and MaxDps.tier[33].count) >3) and cooldown[classtable.ArcaneMissiles].ready then
         if not setSpell then setSpell = classtable.ArcaneMissiles end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((cooldown[classtable.TouchoftheMagi].ready or cooldown[classtable.TouchoftheMagi].remains<((1 + 0.05)>(gcd+1))) and (cooldown[classtable.ArcaneSurge].remains >30 and cooldown[classtable.ArcaneSurge].remains <75)) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((cooldown[classtable.TouchoftheMagi].ready or cooldown[classtable.TouchoftheMagi].remains< max((1 + 0.05),(gcd+1))) and (cooldown[classtable.ArcaneSurge].remains >30 and cooldown[classtable.ArcaneSurge].remains <75)) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (ArcaneCharges == 4 and buff[classtable.ArcaneHarmonyBuff].count >= 20 and (MaxDps.tier and MaxDps.tier[34].count >= 4)) and cooldown[classtable.ArcaneBarrage].ready then
