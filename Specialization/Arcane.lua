@@ -221,10 +221,10 @@ function Arcane:spellslinger()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneOrb, 'ArcaneOrb')) and (targets == 1 and (cooldown[classtable.TouchoftheMagi].remains <6 or not talents[classtable.ChargedOrb] or buff[classtable.ArcaneSurgeBuff].up or cooldown[classtable.ArcaneOrb].charges >1.5)) and cooldown[classtable.ArcaneOrb].ready then
         if not setSpell then setSpell = classtable.ArcaneOrb end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (targets >= 2 and ArcaneCharges == 4 and cooldown[classtable.ArcaneOrb].remains <gcd and (buff[classtable.ArcaneHarmonyBuff].count<=(8+(10 * not (MaxDps.tier and MaxDps.tier[34].count >= 4)))) and ((((MaxDps.spellHistory[1] == classtable.ArcaneBarrage) or (MaxDps.spellHistory[1] == classtable.ArcaneOrb)) and buff[classtable.NetherPrecisionBuff].count == 1) or buff[classtable.NetherPrecisionBuff].count == 2 or not buff[classtable.NetherPrecisionBuff].up)) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (targets >= 2 and ArcaneCharges == 4 and cooldown[classtable.ArcaneOrb].remains <gcd and (buff[classtable.ArcaneHarmonyBuff].count<=(8+(10 * (not (MaxDps.tier and MaxDps.tier[34].count >= 4) and 1 or 0)))) and ((((MaxDps.spellHistory[1] == classtable.ArcaneBarrage) or (MaxDps.spellHistory[1] == classtable.ArcaneOrb)) and buff[classtable.NetherPrecisionBuff].count == 1) or buff[classtable.NetherPrecisionBuff].count == 2 or not buff[classtable.NetherPrecisionBuff].up)) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (targets >2 and (ArcaneCharges == 4 and not (MaxDps.tier and MaxDps.tier[34].count >= 4))) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (targets >2 and (ArcaneCharges == 4 and (not (MaxDps.tier and MaxDps.tier[34].count >= 4) and 1 or 0))) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneOrb, 'ArcaneOrb')) and (targets >1 and buff[classtable.ArcaneHarmonyBuff].count <20 and (buff[classtable.ArcaneSurgeBuff].up or buff[classtable.NetherPrecisionBuff].up or targets >= 7) and (MaxDps.tier and MaxDps.tier[34].count >= 4)) and cooldown[classtable.ArcaneOrb].ready then
@@ -242,7 +242,7 @@ function Arcane:spellslinger()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and (talents[classtable.HighVoltage] and ArcaneCharges == 4 and buff[classtable.ClearcastingBuff].up and buff[classtable.NetherPrecisionBuff].count == 1) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((targets == 1 and (talents[classtable.OrbBarrage] or (targethealthPerc <35 and talents[classtable.ArcaneBombardment])) and (cooldown[classtable.ArcaneOrb].remains <gcd) and ArcaneCharges == 4 and (cooldown[classtable.TouchoftheMagi].remains >gcd*6 or not talents[classtable.MagisSpark]) and (not buff[classtable.NetherPrecisionBuff].up or (buff[classtable.NetherPrecisionBuff].count == 1 and buff[classtable.ClearcastingBuff].count == 0))) and not (MaxDps.tier and MaxDps.tier[34].count >= 4)) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((targets == 1 and (talents[classtable.OrbBarrage] or (targethealthPerc <35 and talents[classtable.ArcaneBombardment])) and (cooldown[classtable.ArcaneOrb].remains <gcd) and ArcaneCharges == 4 and (cooldown[classtable.TouchoftheMagi].remains >gcd*6 or not talents[classtable.MagisSpark]) and (not buff[classtable.NetherPrecisionBuff].up or (buff[classtable.NetherPrecisionBuff].count == 1 and buff[classtable.ClearcastingBuff].count == 0))) and (not (MaxDps.tier and MaxDps.tier[34].count >= 4) and 1 or 0)) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'ArcaneExplosion')) and (targets >1 and ((ArcaneCharges <1 and not talents[classtable.HighVoltage]) or (ArcaneCharges <3 and (not buff[classtable.ClearcastingBuff].up or talents[classtable.Reverberate])))) and cooldown[classtable.ArcaneExplosion].ready then
@@ -251,7 +251,7 @@ function Arcane:spellslinger()
     if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'ArcaneExplosion')) and (targets == 1 and ArcaneCharges <2 and not buff[classtable.ClearcastingBuff].up) and cooldown[classtable.ArcaneExplosion].ready then
         if not setSpell then setSpell = classtable.ArcaneExplosion end
     end
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((((targethealthPerc <35 and (debuff[classtable.TouchoftheMagiDeBuff].remains<(gcd * 1.25)) and (debuff[classtable.TouchoftheMagiDeBuff].remains >1)) or ((buff[classtable.ArcaneSurgeBuff].remains <gcd) and buff[classtable.ArcaneSurgeBuff].up)) and ArcaneCharges == 4) and not (MaxDps.tier and MaxDps.tier[34].count >= 4)) and cooldown[classtable.ArcaneBarrage].ready then
+    if (MaxDps:CheckSpellUsable(classtable.ArcaneBarrage, 'ArcaneBarrage')) and ((((targethealthPerc <35 and (debuff[classtable.TouchoftheMagiDeBuff].remains<(gcd * 1.25)) and (debuff[classtable.TouchoftheMagiDeBuff].remains >1)) or ((buff[classtable.ArcaneSurgeBuff].remains <gcd) and buff[classtable.ArcaneSurgeBuff].up)) and ArcaneCharges == 4) and (not (MaxDps.tier and MaxDps.tier[34].count >= 4) and 1 or 0)) and cooldown[classtable.ArcaneBarrage].ready then
         if not setSpell then setSpell = classtable.ArcaneBarrage end
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and cooldown[classtable.ArcaneBlast].ready then
