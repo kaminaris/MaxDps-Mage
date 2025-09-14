@@ -108,6 +108,8 @@ local function ClearCDs()
     MaxDps:GlowCooldown(classtable.AlterTime, false)
     MaxDps:GlowCooldown(classtable.ConjureManaGem, false)
     MaxDps:GlowCooldown(classtable.ManaGem, false)
+    MaxDps:GlowCooldown(classtable.ArcanePower, false)
+    MaxDps:GlowCooldown(classtable.RuneofPower, false)
 end
 
 function Arcane:callaction()
@@ -123,7 +125,8 @@ function Arcane:callaction()
     --    if not setSpell then setSpell = classtable.TimeWarp end
     --end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'ArcanePower')) and (ttd <18) and cooldown[classtable.ArcanePower].ready then
-        if not setSpell then setSpell = classtable.ArcanePower end
+        --if not setSpell then setSpell = classtable.ArcanePower end
+        MaxDps:GlowCooldown(classtable.ArcanePower, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')) and (buff[classtable.AlterTimeBuff].up and buff[classtable.PresenceofMindBuff].up) and cooldown[classtable.ArcaneBlast].ready then
         if not setSpell then setSpell = classtable.ArcaneBlast end
@@ -150,10 +153,12 @@ function Arcane:callaction()
     if (MaxDps:CheckSpellUsable(classtable.RuneofPower, 'RuneofPower')) and --MaxDps:FindBuffAuraData(spellID)
     (talents[classtable.RuneofPower] and buff[classtable.RuneofPowerBuff].refreshable) and
     cooldown[classtable.RuneofPower].ready then
-        if not setSpell then setSpell = classtable.RuneofPower end
+        --if not setSpell then setSpell = classtable.RuneofPower end
+        MaxDps:GlowCooldown(classtable.RuneofPower, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.ArcanePower, 'ArcanePower')) and (not buff[classtable.AlterTimeBuff].up and ArcaneCharges >2) and cooldown[classtable.ArcanePower].ready then
-        if not setSpell then setSpell = classtable.ArcanePower end
+        --if not setSpell then setSpell = classtable.ArcanePower end
+        MaxDps:GlowCooldown(classtable.ArcanePower, true)
     end
     if (MaxDps:CheckSpellUsable(classtable.PresenceofMind, 'PresenceofMind')) and (not buff[classtable.AlterTimeBuff].up) and cooldown[classtable.PresenceofMind].ready then
         if not setSpell then setSpell = classtable.PresenceofMind end
