@@ -153,6 +153,8 @@ function Mage:Arcane()
     classtable.ConeofCold = 10161
     classtable.Flamestrike = 10216
     classtable.Evocation = 12051
+    classtable.FireBlast = 2136
+    classtable.ArcaneMissiles = 5143
 
     local function debugg()
     end

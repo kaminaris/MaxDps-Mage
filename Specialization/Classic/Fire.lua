@@ -90,9 +90,9 @@ function Fire:AoE()
     if (MaxDps:CheckSpellUsable(classtable.Flamestrike, 'Flamestrike')) and (MaxDps:FindADAuraData(classtable.Flamestrike).up or MaxDps:FindADAuraData(classtable.Flamestrike).refreshable) and cooldown[classtable.Flamestrike].ready then
         if not setSpell then setSpell = classtable.Flamestrike end
     end
-    if (MaxDps:CheckSpellUsable(classtable.BlastWave, 'Blast Wave')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.BlastWave].ready then
-        if not setSpell then setSpell = classtable.BlastWave end
-    end
+    --if (MaxDps:CheckSpellUsable(classtable.BlastWave, 'Blast Wave')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.BlastWave].ready then
+    --    if not setSpell then setSpell = classtable.BlastWave end
+    --end
     if (MaxDps:CheckSpellUsable(classtable.ArcaneExplosion, 'Arcane Explosion')) and (( LibRangeCheck and LibRangeCheck:GetRange ( 'target', true ) or 0 ) <10) and cooldown[classtable.ArcaneExplosion].ready then
         if not setSpell then setSpell = classtable.ArcaneExplosion end
     end
