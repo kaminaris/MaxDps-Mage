@@ -70,21 +70,54 @@ local function ClearCDs()
 end
 
 function Arcane:Single()
-    if (MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast'))
-    --and (ArcaneCharges < 3)
-    and (MaxDps.spellHistory[1] ~= classtable.ArcaneBlast)
-    and (MaxDps.spellHistory[2] ~= classtable.ArcaneBlast)
-    and (MaxDps.spellHistory[3] ~= classtable.ArcaneBlast)
-    and cooldown[classtable.ArcaneBlast].ready then
-        if not setSpell then setSpell = classtable.ArcaneBlast end
+    -- Get Arcane Blast debuff stacks
+    local aura = C_UnitAuras.GetPlayerAuraBySpellID(36032)
+    local abDebuff = aura and aura.applications or 0
+
+    -- Cooldowns active always Arcane Blast
+    if buff[classtable.ArcanePower] and buff[classtable.ArcanePower].up then
+        if MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')
+            and cooldown[classtable.ArcaneBlast].ready
+        then
+            return classtable.ArcaneBlast
+        end
     end
-    if (MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt'))
-    --and (ArcaneCharges < 3)
-    and (MaxDps.spellHistory[1] ~= classtable.Frostbolt)
-    and (MaxDps.spellHistory[2] ~= classtable.Frostbolt)
-    and (MaxDps.spellHistory[3] ~= classtable.Frostbolt)
-    and cooldown[classtable.Frostbolt].ready then
-        if not setSpell then setSpell = classtable.Frostbolt end
+
+    -- High mana Arcane Blast spam
+    if Mana > 3000 then
+        if MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')
+            and cooldown[classtable.ArcaneBlast].ready
+        then
+            return classtable.ArcaneBlast
+        end
+    end
+
+    -- Low mana filler rotation based on AB stacks
+    if Mana <= 3000 then
+        -- If AB debuff < 3 cast Arcane Blast
+        if abDebuff < 3 then
+            if MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')
+                and cooldown[classtable.ArcaneBlast].ready
+            then
+                return classtable.ArcaneBlast
+            end
+        end
+
+        -- If AB debuff = 3 cast Frostbolt
+        if abDebuff >= 3 then
+            if MaxDps:CheckSpellUsable(classtable.Frostbolt, 'Frostbolt')
+                and cooldown[classtable.Frostbolt].ready
+            then
+                return classtable.Frostbolt
+            end
+        end
+    end
+
+    -- Fallback
+    if MaxDps:CheckSpellUsable(classtable.ArcaneBlast, 'ArcaneBlast')
+        and cooldown[classtable.ArcaneBlast].ready
+    then
+        return classtable.ArcaneBlast
     end
 end
 
@@ -136,6 +169,7 @@ function Mage:Arcane()
     ManaPerc = (Mana / ManaMax) * 100
 
     classtable.ArcaneBlast = 30451
+    classtable.ArcaneBlastDeBuff = 36032
     classtable.ArcanePower = 12042
     classtable.PresenceofMind = 12043
     classtable.Frostbolt = 10181
