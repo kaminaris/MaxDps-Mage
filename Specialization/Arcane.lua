@@ -51,7 +51,8 @@ function Mage:Arcane()
         end
     end
     if MaxDpsOptions.global.enableNewAuraSystem and MaxDps.SetupAuraContainer and aurasSetup then
-        --MaxDps:SetupAuraContainer()
+        -- Arcane Barrage if Arcane Soul is active
+        MaxDps:SetupAuraContainer({[44425] = true},{[451038] = true})
         aurasSetup = false
     end
     for itemID, spellID in pairs(usedTrinkets) do

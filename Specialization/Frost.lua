@@ -51,7 +51,8 @@ function Mage:Frost()
         end
     end
     if MaxDpsOptions.global.enableNewAuraSystem and MaxDps.SetupAuraContainer and aurasSetup then
-        --MaxDps:SetupAuraContainer()
+        -- Cast Flurry With Brain Freeze
+        MaxDps:SetupAuraContainer({[44614] = true},{[190446] = true})
         aurasSetup = false
     end
     for itemID, spellID in pairs(usedTrinkets) do

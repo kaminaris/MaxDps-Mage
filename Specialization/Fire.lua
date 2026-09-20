@@ -51,7 +51,8 @@ function Mage:Fire()
         end
     end
     if MaxDpsOptions.global.enableNewAuraSystem and MaxDps.SetupAuraContainer and aurasSetup then
-        --MaxDps:SetupAuraContainer()
+        -- Spend Hotstreak on Pyroblast or Flamestrike
+        MaxDps:SetupAuraContainer({[11366] = true, [1254851] = true},{[48108] = true})
         aurasSetup = false
     end
     for itemID, spellID in pairs(usedTrinkets) do
