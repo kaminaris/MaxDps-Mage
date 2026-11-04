@@ -1,4 +1,4 @@
-## Title: MaxDps_Mage
+﻿## Title: MaxDps_Mage
 ## Version: @project-version@
 ## Author: Kaminaris
 ## Interface: 120105
@@ -16,32 +16,26 @@
 ## X-Wago-ID: nKW1bLNE
 
 Main.lua
-#@retail@
-Specialization/Arcane.lua
-Specialization/Frost.lua
-Specialization/Fire.lua
-#@end-retail@
+Specialization/Arcane.lua [AllowLoadGameType standard]
+Specialization/Frost.lua [AllowLoadGameType standard]
+Specialization/Fire.lua [AllowLoadGameType standard]
 
-#@version-cata@
-Specialization/Cata/Arcane.lua
-Specialization/Cata/Frost.lua
-Specialization/Cata/Fire.lua
-#@end-version-cata@
+Specialization/Cata/Arcane.lua [AllowLoadGameType cata]
+Specialization/Cata/Frost.lua [AllowLoadGameType cata]
+Specialization/Cata/Fire.lua [AllowLoadGameType cata]
 
-#@version-bcc@
-Specialization/TBC/Arcane.lua
-Specialization/TBC/Frost.lua
-Specialization/TBC/Fire.lua
-#@end-version-bcc@
+Specialization/TBC/Arcane.lua [AllowLoadGameType tbc]
+Specialization/TBC/Frost.lua [AllowLoadGameType tbc]
+Specialization/TBC/Fire.lua [AllowLoadGameType tbc]
 
-#@version-classic@
-Specialization/Classic/Arcane.lua
-Specialization/Classic/Frost.lua
-Specialization/Classic/Fire.lua
-#@end-version-classic@
+Specialization/Classic/Arcane.lua [AllowLoadGameType vanilla]
+Specialization/Classic/Frost.lua [AllowLoadGameType vanilla]
+Specialization/Classic/Fire.lua [AllowLoadGameType vanilla]
 
-#@version-mists@
-Specialization/Mop/Arcane.lua
-Specialization/Mop/Frost.lua
-Specialization/Mop/Fire.lua
-#@end-version-mists@
+Specialization/Mop/Arcane.lua [AllowLoadGameType mists]
+Specialization/Mop/Frost.lua [AllowLoadGameType mists]
+Specialization/Mop/Fire.lua [AllowLoadGameType mists]
+
+Specialization/Forever/Arcane.lua [AllowLoadGameType forever]
+Specialization/Forever/Frost.lua [AllowLoadGameType forever]
+Specialization/Forever/Fire.lua [AllowLoadGameType forever]
